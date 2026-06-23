@@ -1,0 +1,12 @@
+# Data & Play design system — native Streamlit theme.
+# This is what makes text legible: it switches Streamlit's internal theme to
+# light so its auto-generated text colors (widget labels, markdown, and the
+# canvas-rendered dataframe, which CSS cannot touch) render dark-on-paper.
+[theme]
+base = "light"
+primaryColor = "#0C447C"            # slate — buttons, links, focus, active
+backgroundColor = "#E8E4DC"         # warm-paper page background
+secondaryBackgroundColor = "#F1EFE8" # paper — cards, sidebar, table header
+textColor = "#2C2C2A"               # ink — primary text
+linkColor = "#0C447C"
+font = "Space Grotesk, sans-serif"

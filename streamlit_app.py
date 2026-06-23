@@ -94,6 +94,36 @@ VENDOR_ICONS = {
 
 CUSTOM_CSS = """
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+        /* Brand palette */
+        --slate:    #0C447C;
+        --teal:     #1D9E75;
+        --graphite: #5F5E5A;
+        --sand:     #F1EFE8;
+        --coral:    #D85A30;
+        --amber:    #BA7517;
+        --paper:    #F1EFE8;
+        --ink:      #2C2C2A;
+
+        /* Semantic tokens */
+        --primary:       var(--slate);
+        --primary-hover: #0A3866;
+        --bg-dark:       #E8E4DC;
+        --bg-card:       var(--paper);
+        --field:         #FBFAF6;
+        --text-main:     var(--ink);
+        --text-muted:    var(--graphite);
+        --border:        rgba(44, 44, 42, 0.16);
+        --border-faint:  rgba(44, 44, 42, 0.08);
+        --accent:        var(--teal);
+        --error:         var(--coral);
+
+        --font-display: 'Space Grotesk', system-ui, sans-serif;
+        --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+    }
+
     .main .block-container { max-width: 1400px; padding-top: 2rem; }
 
     div[data-testid="stHeader"] {
@@ -101,57 +131,118 @@ CUSTOM_CSS = """
     }
 
     .stApp {
-        background: #0c0c0e;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        /* faint engineering-paper grid */
+        background-image:
+            linear-gradient(rgba(44, 44, 42, 0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(44, 44, 42, 0.035) 1px, transparent 1px);
+        background-size: 28px 28px;
+    }
+
+    /* Structural type → Space Grotesk, tight tracking */
+    .stApp, .stApp p, .stApp label, .stApp span, .stApp div {
+        font-family: var(--font-display);
+    }
+
+    h1, h2, h3, .stApp h1, .stApp h2, .stApp h3 {
+        font-family: var(--font-display) !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.035em !important;
+        color: var(--text-main) !important;
+    }
+
+    /* App title + caption */
+    .stApp [data-testid="stCaptionContainer"],
+    .stApp [data-testid="stCaptionContainer"] p {
+        font-family: var(--font-mono) !important;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-muted) !important;
     }
 
     .stTextInput > div > div > input,
     .stSelectbox > div > div > select,
+    .stSelectbox div[data-baseweb="select"] > div,
     .stNumberInput > div > div > input {
-        background-color: #161618 !important;
-        border: 1px solid #38383a !important;
-        color: #ffffff !important;
+        background-color: var(--field) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 0.6rem !important;
+        color: var(--text-main) !important;
+        font-family: var(--font-mono) !important;
     }
 
+    .stTextInput > div > div > input:focus,
+    .stNumberInput > div > div > input:focus {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 2px rgba(12, 68, 124, 0.12) !important;
+    }
+
+    .stTextInput input::placeholder { color: var(--text-muted) !important; }
+
     .stButton > button {
-        background-color: #007aff !important;
-        color: #ffffff !important;
+        background-color: var(--primary) !important;
+        color: var(--sand) !important;
         border: none !important;
-        font-weight: 500 !important;
+        border-radius: 0.6rem !important;
+        font-family: var(--font-display) !important;
+        font-weight: 700 !important;
+        transition: background 0.15s ease, transform 0.15s ease !important;
     }
 
     .stButton > button:hover {
-        background-color: #0056b3 !important;
+        background-color: var(--primary-hover) !important;
+        transform: translateY(-1px);
     }
 
     .stButton > button:disabled {
-        opacity: 0.5 !important;
-        cursor: not-allowed !important;
+        opacity: 0.45 !important;
+        cursor: default !important;
+        transform: none !important;
     }
 
     .stCheckbox > label {
-        color: #c7c7cc !important;
+        color: var(--text-main) !important;
         font-size: 0.8125rem !important;
     }
 
     .stCheckbox > label > div {
-        border-color: #38383a !important;
+        border-color: var(--border) !important;
     }
 
     .stCheckbox > label > div[data-baseweb="checkbox"][aria-checked="true"] {
-        background-color: #007aff !important;
-        border-color: #007aff !important;
+        background-color: var(--primary) !important;
+        border-color: var(--primary) !important;
+    }
+
+    div[data-testid="stMetric"] {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 0 rgba(44, 44, 42, 0.04);
+        padding: 12px 16px;
     }
 
     div[data-testid="stMetricValue"] {
+        font-family: var(--font-display) !important;
         font-size: 2rem !important;
-        color: #ffffff !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.04em !important;
+        color: var(--text-main) !important;
     }
 
     div[data-testid="stMetricLabel"] {
-        color: #a1a1a6 !important;
-        font-size: 0.75rem !important;
+        font-family: var(--font-mono) !important;
+        color: var(--text-muted) !important;
+        font-size: 0.72rem !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.03em !important;
+        letter-spacing: 0.06em !important;
+    }
+
+    /* Hairline dividers */
+    hr, div[data-testid="stDivider"] hr {
+        border-color: var(--border) !important;
+        background-color: var(--border) !important;
     }
 
     .vendor-pill {
@@ -159,24 +250,24 @@ CUSTOM_CSS = """
         align-items: center;
         gap: 6px;
         padding: 4px 10px;
-        border-radius: 6px;
-        border: 1px solid #38383a;
-        background: #1c1c1f;
-        color: #c7c7cc;
-        font-size: 0.75rem;
-        font-family: 'IBM Plex Mono', monospace;
+        border-radius: 0.55rem;
+        border: 1px solid var(--border);
+        background: var(--field);
+        color: var(--text-main);
+        font-size: 0.72rem;
+        font-family: var(--font-mono);
         cursor: pointer;
         transition: all 0.15s;
     }
 
     .vendor-pill:hover {
-        border-color: #007aff;
-        background: #161618;
+        border-color: var(--primary);
+        background: var(--bg-card);
     }
 
     .vendor-pill.active {
-        border-color: #007aff;
-        background: rgba(0,122,255,0.12);
+        border-color: var(--primary);
+        background: rgba(12, 68, 124, 0.08);
     }
 
     .vendor-pill img {
@@ -186,29 +277,32 @@ CUSTOM_CSS = """
     }
 
     .section-label {
-        font-size: 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #a1a1a6;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
         margin-bottom: 8px;
     }
 
     .stDataFrame {
-        border: 1px solid #38383a !important;
-        border-radius: 8px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 0.6rem !important;
     }
 
     .stDataFrame th {
-        background-color: #161618 !important;
-        color: #a1a1a6 !important;
-        font-size: 0.75rem !important;
+        background-color: var(--field) !important;
+        color: var(--text-muted) !important;
+        font-family: var(--font-mono) !important;
+        font-size: 0.72rem !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.03em !important;
+        letter-spacing: 0.04em !important;
     }
 
     .stDataFrame td {
+        font-family: var(--font-mono) !important;
         font-size: 0.8125rem !important;
-        color: #ffffff !important;
+        color: var(--text-main) !important;
     }
 
     .nav-link {
@@ -216,20 +310,25 @@ CUSTOM_CSS = """
         top: 12px;
         right: 24px;
         z-index: 9999;
-        padding: 6px 14px;
-        border-radius: 6px;
-        border: 1px solid #38383a;
-        background: #161618;
-        color: #a1a1a6;
-        font-size: 0.75rem;
-        font-family: 'IBM Plex Mono', monospace;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 0.85rem;
+        border-radius: 0.55rem;
+        border: none;
+        background: var(--primary);
+        color: var(--sand);
+        font-size: 0.8rem;
+        font-weight: 600;
+        font-family: var(--font-display);
         text-decoration: none;
-        transition: all 0.15s;
+        transition: background 0.15s ease, transform 0.15s ease;
     }
 
     .nav-link:hover {
-        border-color: #007aff;
-        color: #ffffff;
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+        color: var(--sand);
     }
 </style>
 <script type="application/ld+json">
@@ -271,7 +370,7 @@ st.markdown(
 )
 
 st.title("Script Auditor")
-st.caption("Detect all JS scripts loaded on a page, including GTM-injected ones")
+st.caption("// detect all JS loaded on a page, incl. GTM-injected")
 
 
 def extract_domain(url):
@@ -402,7 +501,7 @@ if scripts:
     st.divider()
 
     # Vendor breakdown
-    st.markdown('<p class="section-label">Vendors detected</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-label">// vendors detected</p>', unsafe_allow_html=True)
 
     vendor_counts = Counter(s["vendor"] for s in scripts)
     sorted_vendors = sorted(vendor_counts.items(), key=lambda x: x[1], reverse=True)
@@ -439,7 +538,7 @@ if scripts:
     df = pd.DataFrame(rows)
 
     # Filters
-    st.markdown('<p class="section-label">Filter scripts</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-label">// filter scripts</p>', unsafe_allow_html=True)
 
     filter_col1, filter_col2 = st.columns(2)
     with filter_col1:
@@ -486,7 +585,7 @@ if scripts:
     )
 
     st.divider()
-    st.caption(f"Scanned at {st.session_state.scanned_at}")
+    st.caption(f"// scanned at {st.session_state.scanned_at}")
 
     # Export
     st.download_button(

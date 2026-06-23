@@ -6,14 +6,14 @@
   <title>Script Auditor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
   <link rel="apple-touch-icon" sizes="180x180" href="/static/icon-180x180.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/static/icon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/static/icon-16x16.png">
   <link rel="manifest" href="/static/manifest.json">
-  <meta name="theme-color" content="#0c0c0e">
+  <meta name="theme-color" content="#F1EFE8">
   <meta name="application-name" content="Script Auditor">
   <script type="application/ld+json">
   {
@@ -46,60 +46,107 @@
   }
   </script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     :root {
-      --color-bg: #0c0c0e;
-      --color-bg-surface: #161618;
-      --color-bg-elevated: #1c1c1f;
-      --color-text: #ffffff;
-      --color-text-secondary: #c7c7cc;
-      --color-text-muted: #a1a1a6;
-      --color-text-disabled: #68686f;
-      --color-accent: #007aff;
-      --color-accent-hover: #0056b3;
-      --color-success: #30d158;
-      --color-warning: #ff9f0a;
-      --color-danger: #ff453a;
-      --color-border: #38383a;
-      --color-border-muted: #2c2c2e;
-      --font-mono: 'IBM Plex Mono', 'SF Mono', 'Fira Code', monospace;
-      --font-size-xs: 0.75rem;
+      /* Brand palette */
+      --slate:    #0C447C;
+      --teal:     #1D9E75;
+      --graphite: #5F5E5A;
+      --sand:     #F1EFE8;
+      --violet:   #534AB7;
+      --coral:    #D85A30;
+      --magenta:  #D4537E;
+      --amber:    #BA7517;
+      --paper:    #F1EFE8;
+      --ink:      #2C2C2A;
+
+      /* Semantic tokens */
+      --primary:       var(--slate);
+      --primary-hover: #0A3866;
+      --bg-dark:       #E8E4DC;
+      --bg-card:       var(--paper);
+      --field:         #FBFAF6;
+      --text-main:     var(--ink);
+      --text-muted:    var(--graphite);
+      --border:        rgba(44, 44, 42, 0.16);
+      --border-faint:  rgba(44, 44, 42, 0.08);
+      --accent:        var(--teal);
+      --error:         var(--coral);
+
+      --font-display: "Space Grotesk", system-ui, sans-serif;
+      --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+      --font-size-xs: 0.72rem;
       --font-size-sm: 0.8125rem;
-      --font-size-md: 0.9375rem;
-      --border-radius-sm: 0.1875rem;
-      --border-radius-md: 0.3125rem;
-      --border-radius-lg: 0.5rem;
+      --font-size-md: 0.95rem;
+      --radius-sm: 0.35rem;
+      --radius-md: 0.55rem;
+      --radius-lg: 0.75rem;
+
+      color-scheme: light;
     }
 
     body {
-      background-color: var(--color-bg);
-      color: var(--color-text);
-      font-family: var(--font-mono);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-display);
       font-size: var(--font-size-sm);
+      letter-spacing: -0.01em;
       min-height: 100vh;
       line-height: 1.5;
+      /* faint engineering-paper grid — opaque cards cover it */
+      background-image:
+        linear-gradient(rgba(44, 44, 42, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(44, 44, 42, 0.035) 1px, transparent 1px);
+      background-size: 28px 28px;
     }
 
+    /* Small uppercase code-comment label — the signature accent of this system */
+    .mono { font-family: var(--font-mono); letter-spacing: 0.04em; }
+
     header {
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--color-border);
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       gap: 12px;
+      background: var(--bg-card);
     }
 
     header h1 {
-      font-size: var(--font-size-md);
-      font-weight: 600;
-      color: var(--color-text);
-      letter-spacing: -0.01em;
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.035em;
     }
 
-    header span {
+    header .tagline {
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
-      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
     }
+
+    .header-cta {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--primary);
+      color: var(--sand);
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-md);
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .header-cta:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
     main {
       max-width: 1200px;
@@ -107,10 +154,14 @@
       padding: 24px;
     }
 
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 1px 0 rgba(44, 44, 42, 0.04);
+    }
+
     .input-card {
-      background: var(--color-bg-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-lg);
       padding: 20px;
       margin-bottom: 24px;
     }
@@ -121,60 +172,58 @@
       align-items: center;
     }
 
-    .url-input {
-      flex: 1;
-      background: var(--color-bg);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-md);
-      padding: 10px 12px;
-      color: var(--color-text);
+    .control-input {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.7rem 0.9rem;
+      color: var(--text-main);
       font-family: var(--font-mono);
       font-size: var(--font-size-sm);
       outline: none;
-      transition: border-color 0.15s;
+      appearance: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
 
-    .url-input:focus {
-      border-color: var(--color-accent);
+    .control-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(12, 68, 124, 0.12);
     }
 
-    .url-input::placeholder { color: var(--color-text-muted); }
+    .url-input { flex: 1; }
+    .url-input::placeholder { color: var(--text-muted); }
 
-    .timeout-select {
-      background: var(--color-bg);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-md);
-      padding: 10px 12px;
-      color: var(--color-text);
-      font-family: var(--font-mono);
-      font-size: var(--font-size-sm);
+    select.control-input {
       cursor: pointer;
-      outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235F5E5A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      padding-right: 2.3rem;
     }
 
     .btn-primary {
-      background: var(--color-accent);
-      color: var(--color-text);
+      background: var(--primary);
+      color: var(--sand);
       border: none;
-      border-radius: var(--border-radius-md);
-      padding: 10px 20px;
-      font-family: var(--font-mono);
+      border-radius: var(--radius-md);
+      padding: 0.7rem 1.4rem;
+      font-family: var(--font-display);
       font-size: var(--font-size-sm);
-      font-weight: 500;
+      font-weight: 700;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.15s, transform 0.15s;
       white-space: nowrap;
     }
 
-    .btn-primary:hover { background: var(--color-accent-hover); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.45; cursor: default; transform: none; }
 
     .interaction-options {
       margin-top: 16px;
       padding: 14px 16px;
-      background: var(--color-bg);
-      border: 1px solid var(--color-border-muted);
-      border-radius: var(--border-radius-md);
+      background: var(--field);
+      border: 1px solid var(--border-faint);
+      border-radius: var(--radius-md);
       display: flex;
       gap: 20px;
       align-items: center;
@@ -187,37 +236,39 @@
       gap: 8px;
       cursor: pointer;
       font-size: var(--font-size-xs);
-      color: var(--color-text-secondary);
+      color: var(--text-main);
     }
 
     .interaction-options input[type="checkbox"] {
       width: 14px;
       height: 14px;
-      accent-color: var(--color-accent);
+      accent-color: var(--primary);
       cursor: pointer;
     }
 
     .interaction-options input[type="number"] {
-      width: 50px;
-      background: var(--color-bg-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-sm);
+      width: 52px;
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       padding: 4px 8px;
-      color: var(--color-text);
+      color: var(--text-main);
       font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       outline: none;
     }
 
     .interaction-options input[type="number"]:focus {
-      border-color: var(--color-accent);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(12, 68, 124, 0.12);
     }
 
     .interaction-title {
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
-      color: var(--color-text-muted);
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
 
     #progress {
@@ -225,15 +276,16 @@
       align-items: center;
       gap: 12px;
       margin-top: 16px;
-      color: var(--color-text-muted);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
     }
 
     .spinner {
       width: 14px;
       height: 14px;
-      border: 2px solid var(--color-border);
-      border-top-color: var(--color-accent);
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
@@ -244,10 +296,10 @@
       display: none;
       margin-top: 12px;
       padding: 10px 14px;
-      background: rgba(255,69,58,0.1);
-      border: 1px solid rgba(255,69,58,0.3);
-      border-radius: var(--border-radius-md);
-      color: var(--color-danger);
+      background: rgba(216, 90, 48, 0.08);
+      border: 1px solid rgba(216, 90, 48, 0.3);
+      border-radius: var(--radius-md);
+      color: var(--error);
       font-size: var(--font-size-xs);
     }
 
@@ -261,55 +313,61 @@
     }
 
     .stat {
-      background: var(--color-bg-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 1px 0 rgba(44, 44, 42, 0.04);
       padding: 12px 16px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      min-width: 100px;
+      gap: 6px;
+      min-width: 110px;
     }
 
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--color-text);
+    .kpi-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--text-main);
       line-height: 1;
     }
 
-    .stat-label {
+    .kpi-label {
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
-      color: var(--color-text-muted);
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.06em;
     }
 
     .badge {
       display: inline-block;
       padding: 3px 8px;
-      border-radius: var(--border-radius-sm);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       font-weight: 500;
     }
 
     .badge-gtm {
-      background: rgba(0,122,255,0.15);
-      color: var(--color-accent);
-      border: 1px solid rgba(0,122,255,0.3);
+      background: rgba(12, 68, 124, 0.1);
+      color: var(--primary);
+      border: 1px solid rgba(12, 68, 124, 0.3);
     }
 
     .badge-no-gtm {
-      background: var(--color-bg);
-      color: var(--color-text-muted);
-      border: 1px solid var(--color-border);
+      background: var(--field);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
     }
 
     .section-title {
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-text-muted);
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
       margin-bottom: 10px;
     }
 
@@ -321,41 +379,42 @@
     }
 
     .vendor-chip {
-      background: var(--color-bg-elevated);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-md);
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
       padding: 5px 10px;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       cursor: pointer;
       transition: all 0.15s;
     }
 
     .vendor-chip:hover {
-      border-color: var(--color-accent);
-      background: var(--color-bg-surface);
+      border-color: var(--primary);
+      background: var(--bg-card);
     }
 
     .vendor-chip.active {
-      border-color: var(--color-accent);
-      background: rgba(0,122,255,0.12);
+      border-color: var(--primary);
+      background: rgba(12, 68, 124, 0.08);
     }
 
     .vendor-chip .vc-icon {
       width: 14px;
       height: 14px;
       border-radius: 2px;
-      background: var(--color-bg);
+      background: var(--bg-dark);
       flex-shrink: 0;
     }
 
-    .vendor-chip .vc-name { color: var(--color-text-secondary); }
+    .vendor-chip .vc-name { color: var(--text-main); }
     .vendor-chip .vc-count {
-      background: var(--color-bg);
-      color: var(--color-text-muted);
-      border-radius: var(--border-radius-sm);
+      background: var(--bg-dark);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
       padding: 1px 6px;
       font-size: var(--font-size-xs);
     }
@@ -369,36 +428,43 @@
     }
 
     .vendor-filter-label {
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
-      color: var(--color-text-muted);
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.04em;
       white-space: nowrap;
     }
 
     .vendor-filter-select {
-      background: var(--color-bg);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-md);
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
       padding: 5px 10px;
-      color: var(--color-text);
+      color: var(--text-main);
       font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       cursor: pointer;
       outline: none;
       min-width: 160px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235F5E5A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2rem;
     }
 
     .vendor-filter-select:focus {
-      border-color: var(--color-accent);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(12, 68, 124, 0.12);
     }
 
     .clear-vendor-filter {
       background: transparent;
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       padding: 3px 8px;
-      color: var(--color-text-muted);
+      color: var(--text-muted);
       font-family: var(--font-mono);
       font-size: 10px;
       cursor: pointer;
@@ -406,8 +472,8 @@
     }
 
     .clear-vendor-filter:hover {
-      color: var(--color-text);
-      border-color: var(--color-text-muted);
+      color: var(--text-main);
+      border-color: var(--text-muted);
     }
 
     .clear-vendor-filter.visible {
@@ -428,10 +494,10 @@
 
     .filter-tab {
       background: transparent;
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-md);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
       padding: 5px 12px;
-      color: var(--color-text-muted);
+      color: var(--text-muted);
       font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       cursor: pointer;
@@ -439,15 +505,16 @@
     }
 
     .filter-tab.active, .filter-tab:hover {
-      background: var(--color-bg-surface);
-      color: var(--color-text);
-      border-color: var(--color-accent);
+      background: var(--field);
+      color: var(--text-main);
+      border-color: var(--primary);
     }
 
     .table-wrap {
       overflow-x: auto;
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-md);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
     }
 
     table {
@@ -456,33 +523,35 @@
     }
 
     thead tr {
-      background: var(--color-bg-surface);
-      border-bottom: 1px solid var(--color-border);
+      background: var(--field);
+      border-bottom: 1px solid var(--border);
     }
 
     th {
       padding: 10px 12px;
       text-align: left;
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: var(--color-text-muted);
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
       font-weight: 500;
       white-space: nowrap;
     }
 
     tbody tr {
-      border-bottom: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--border-faint);
       transition: background 0.1s;
     }
 
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--color-bg-elevated); }
-    tbody tr.via-gtm { background: rgba(0,122,255,0.04); }
-    tbody tr.via-gtm:hover { background: rgba(0,122,255,0.08); }
+    tbody tr:hover { background: rgba(44, 44, 42, 0.025); }
+    tbody tr.via-gtm { background: rgba(12, 68, 124, 0.04); }
+    tbody tr.via-gtm:hover { background: rgba(12, 68, 124, 0.08); }
 
     td {
       padding: 10px 12px;
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       vertical-align: middle;
     }
@@ -495,41 +564,46 @@
     }
 
     td.url-cell a {
-      color: var(--color-text-muted);
+      color: var(--text-muted);
       text-decoration: none;
     }
 
-    td.url-cell a:hover { color: var(--color-accent); }
+    td.url-cell a:hover { color: var(--primary); }
 
     .tag {
       display: inline-block;
       padding: 2px 6px;
-      border-radius: var(--border-radius-sm);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
       font-size: 10px;
       font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
-    .tag-external { background: rgba(48,209,88,0.1); color: var(--color-success); }
-    .tag-inline   { background: rgba(255,159,10,0.1);  color: var(--color-warning); }
-    .tag-gtm      { background: rgba(0,122,255,0.15); color: var(--color-accent); }
-    .tag-blocked  { background: rgba(255,69,58,0.12);  color: var(--color-danger); border: 1px solid rgba(255,69,58,0.25); }
-    .tag-no       { color: var(--color-text-muted); }
+    .tag-external { background: rgba(29, 158, 117, 0.12); color: var(--accent); }
+    .tag-inline   { background: rgba(186, 117, 23, 0.12); color: var(--amber); }
+    .tag-gtm      { background: rgba(12, 68, 124, 0.12); color: var(--primary); }
+    .tag-blocked  { background: rgba(216, 90, 48, 0.12); color: var(--error); border: 1px solid rgba(216, 90, 48, 0.25); }
+    .tag-no       { color: var(--text-muted); }
 
-    tbody tr.is-blocked { background: rgba(255,69,58,0.04); }
-    tbody tr.is-blocked:hover { background: rgba(255,69,58,0.08); }
+    tbody tr.is-blocked { background: rgba(216, 90, 48, 0.04); }
+    tbody tr.is-blocked:hover { background: rgba(216, 90, 48, 0.08); }
 
     .block-reason {
       display: block;
+      font-family: var(--font-mono);
       font-size: 10px;
-      color: var(--color-danger);
+      color: var(--error);
       opacity: 0.85;
       margin-top: 2px;
     }
 
     .scanned-at {
       margin-top: 16px;
+      font-family: var(--font-mono);
       font-size: var(--font-size-xs);
-      color: var(--color-text-muted);
+      color: var(--text-muted);
       text-align: right;
     }
   </style>
@@ -538,22 +612,22 @@
 
 <header>
   <h1>Script Auditor</h1>
-  <span>Detect all JS scripts loaded on a page, including GTM-injected ones</span>
-  <a href="http://localhost:8501" style="margin-left:auto;padding:4px 12px;border:1px solid var(--color-border);border-radius:var(--border-radius-md);color:var(--color-text-muted);text-decoration:none;font-size:var(--font-size-xs);transition:all 0.15s" onmouseover="this.style.borderColor='var(--color-accent)';this.style.color='var(--color-text)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-muted)'">V2 (Streamlit) →</a>
+  <span class="tagline">// detect all JS loaded on a page, incl. GTM-injected</span>
+  <a href="http://localhost:8501" class="header-cta">V2 (Streamlit) →</a>
 </header>
 
 <main>
-  <div class="input-card">
+  <div class="card input-card">
     <div class="input-row">
       <input
         id="urlInput"
-        class="url-input"
+        class="control-input url-input"
         type="url"
         placeholder="https://example.com"
         autocomplete="off"
         spellcheck="false"
       />
-      <select id="timeoutSelect" class="timeout-select" title="Timeout per scan">
+      <select id="timeoutSelect" class="control-input timeout-select" title="Timeout per scan">
         <option value="20">20s</option>
         <option value="30" selected>30s</option>
         <option value="45">45s</option>
@@ -564,7 +638,7 @@
     </div>
 
     <div class="interaction-options">
-      <span class="interaction-title">User interactions:</span>
+      <span class="interaction-title">// user interactions</span>
       <label>
         <input type="checkbox" id="clickConsent" checked />
         Click cookie consent
@@ -590,36 +664,36 @@
   <div id="results">
     <div class="summary">
       <div class="stat">
-        <span class="stat-value" id="totalCount">0</span>
-        <span class="stat-label">Total Scripts</span>
+        <span class="kpi-value" id="totalCount">0</span>
+        <span class="kpi-label">Total Scripts</span>
       </div>
       <div class="stat">
-        <span class="stat-value" id="externalCount">0</span>
-        <span class="stat-label">External</span>
+        <span class="kpi-value" id="externalCount">0</span>
+        <span class="kpi-label">External</span>
       </div>
       <div class="stat">
-        <span class="stat-value" id="inlineCount">0</span>
-        <span class="stat-label">Inline</span>
+        <span class="kpi-value" id="inlineCount">0</span>
+        <span class="kpi-label">Inline</span>
       </div>
       <div class="stat">
-        <span class="stat-value" id="gtmInjectedCount">0</span>
-        <span class="stat-label">Via GTM</span>
+        <span class="kpi-value" id="gtmInjectedCount">0</span>
+        <span class="kpi-label">Via GTM</span>
       </div>
       <div class="stat">
-        <span class="stat-value" id="blockedCount" style="color:var(--color-danger)">0</span>
-        <span class="stat-label">Blocked</span>
+        <span class="kpi-value" id="blockedCount" style="color:var(--error)">0</span>
+        <span class="kpi-label">Blocked</span>
       </div>
       <div class="stat" id="gtmStat">
-        <span class="stat-label" style="margin-bottom:6px">GTM Status</span>
+        <span class="kpi-label" style="margin-bottom:6px">GTM Status</span>
         <span id="gtmBadge" class="badge">—</span>
       </div>
     </div>
 
-    <p class="section-title">Vendors detected</p>
+    <p class="section-title">// vendors detected</p>
     <div id="vendorChips" class="vendors"></div>
 
     <div class="table-header">
-      <p class="section-title" style="margin:0">All scripts</p>
+      <p class="section-title" style="margin:0">// all scripts</p>
       <div class="filter-tabs">
         <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
         <button class="filter-tab" onclick="setFilter('external', this)">External</button>
@@ -630,7 +704,7 @@
     </div>
 
     <div class="vendor-filter-bar">
-      <span class="vendor-filter-label">Filter by vendor:</span>
+      <span class="vendor-filter-label">// filter by vendor</span>
       <select id="vendorFilter" class="vendor-filter-select" onchange="applyFilters()">
         <option value="all">All vendors</option>
       </select>
@@ -874,14 +948,14 @@
 
     renderTable(allScripts);
 
-    document.getElementById('scannedAt').textContent = 'Scanned at ' + (data.scanned_at || '');
+    document.getElementById('scannedAt').textContent = '// scanned at ' + (data.scanned_at || '');
     document.getElementById('results').style.display = 'block';
   }
 
   function renderTable(scripts) {
     const tbody = document.getElementById('scriptsBody');
     if (!scripts.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="color:var(--color-text-muted);padding:20px;text-align:center">No scripts found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted);padding:20px;text-align:center">No scripts found</td></tr>';
       return;
     }
     tbody.innerHTML = scripts.map(s => {
@@ -913,11 +987,11 @@
 
       const domain = extractDomain(s.url);
       const domainCell = domain === 'inline'
-        ? '<span style="color:var(--color-text-muted)">inline</span>'
-        : `<span style="color:var(--color-text-secondary)">${esc(domain)}</span>`;
+        ? '<span style="color:var(--text-muted)">inline</span>'
+        : `<span style="color:var(--text-main)">${esc(domain)}</span>`;
 
       const urlCell = s.url === 'inline'
-        ? '<span style="color:var(--color-text-muted)">inline</span>'
+        ? '<span style="color:var(--text-muted)">inline</span>'
         : `<a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.url)}">${esc(s.url)}</a>`;
 
       return `<tr class="${rowClass}">
