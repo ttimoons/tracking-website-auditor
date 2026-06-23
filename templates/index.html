@@ -4,140 +4,238 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Script Auditor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icon-16x16.png">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#0c0c0e">
+  <meta name="application-name" content="Script Auditor">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Script Auditor",
+    "description": "Detect all JavaScript scripts loaded on a webpage, including GTM-injected ones. Identifies vendor, type, and blocked status.",
+    "url": "http://localhost:7070",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Script Auditor"
+    },
+    "browserRequirements": "Requires JavaScript",
+    "softwareVersion": "2.0.0",
+    "featureList": [
+      "JavaScript script detection",
+      "Google Tag Manager script detection",
+      "Vendor identification",
+      "Cookie consent interaction",
+      "Scroll-triggered script detection",
+      "Blocked script detection"
+    ]
+  }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0f1117;
-      --surface: #1a1d27;
-      --surface2: #22263a;
-      --border: #2e3250;
-      --accent: #5b7fff;
-      --accent2: #7c4dff;
-      --green: #3dd68c;
-      --orange: #f5a623;
-      --red: #ff5c5c;
-      --text: #e2e4f0;
-      --muted: #7a7f9a;
-      --font: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Menlo', monospace;
+      --color-bg: #0c0c0e;
+      --color-bg-surface: #161618;
+      --color-bg-elevated: #1c1c1f;
+      --color-text: #ffffff;
+      --color-text-secondary: #c7c7cc;
+      --color-text-muted: #a1a1a6;
+      --color-text-disabled: #68686f;
+      --color-accent: #007aff;
+      --color-accent-hover: #0056b3;
+      --color-success: #30d158;
+      --color-warning: #ff9f0a;
+      --color-danger: #ff453a;
+      --color-border: #38383a;
+      --color-border-muted: #2c2c2e;
+      --font-mono: 'IBM Plex Mono', 'SF Mono', 'Fira Code', monospace;
+      --font-size-xs: 0.75rem;
+      --font-size-sm: 0.8125rem;
+      --font-size-md: 0.9375rem;
+      --border-radius-sm: 0.1875rem;
+      --border-radius-md: 0.3125rem;
+      --border-radius-lg: 0.5rem;
     }
 
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 13px;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
       min-height: 100vh;
+      line-height: 1.5;
     }
 
-    /* ── Layout ── */
     header {
-      padding: 24px 32px 20px;
-      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--color-border);
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 12px;
     }
 
     header h1 {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-      color: #fff;
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      color: var(--color-text);
+      letter-spacing: -0.01em;
     }
 
     header span {
-      font-size: 11px;
-      color: var(--muted);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
     }
 
     main {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 32px;
+      padding: 24px;
     }
 
-    /* ── Input card ── */
     .input-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 24px;
-      margin-bottom: 28px;
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-lg);
+      padding: 20px;
+      margin-bottom: 24px;
     }
 
     .input-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
 
     .url-input {
       flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 14px;
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 13px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      padding: 10px 12px;
+      color: var(--color-text);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
       outline: none;
       transition: border-color 0.15s;
     }
 
     .url-input:focus {
-      border-color: var(--accent);
+      border-color: var(--color-accent);
     }
 
-    .url-input::placeholder { color: var(--muted); }
+    .url-input::placeholder { color: var(--color-text-muted); }
 
     .timeout-select {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 10px;
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 13px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      padding: 10px 12px;
+      color: var(--color-text);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
       cursor: pointer;
       outline: none;
     }
 
-    .btn-audit {
-      background: var(--accent);
-      color: #fff;
+    .btn-primary {
+      background: var(--color-accent);
+      color: var(--color-text);
       border: none;
-      border-radius: 6px;
-      padding: 10px 22px;
-      font-family: var(--font);
-      font-size: 13px;
-      font-weight: 600;
+      border-radius: var(--border-radius-md);
+      padding: 10px 20px;
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: background 0.15s;
       white-space: nowrap;
     }
 
-    .btn-audit:hover { opacity: 0.85; }
-    .btn-audit:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary:hover { background: var(--color-accent-hover); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ── Progress ── */
+    .interaction-options {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border-muted);
+      border-radius: var(--border-radius-md);
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .interaction-options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    .interaction-options input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--color-accent);
+      cursor: pointer;
+    }
+
+    .interaction-options input[type="number"] {
+      width: 50px;
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-sm);
+      padding: 4px 8px;
+      color: var(--color-text);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      outline: none;
+    }
+
+    .interaction-options input[type="number"]:focus {
+      border-color: var(--color-accent);
+    }
+
+    .interaction-title {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
     #progress {
       display: none;
       align-items: center;
       gap: 12px;
       margin-top: 16px;
-      color: var(--muted);
-      font-size: 12px;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-xs);
     }
 
     .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--color-border);
+      border-top-color: var(--color-accent);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      flex-shrink: 0;
+      animation: spin 0.7s linear infinite;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -146,140 +244,210 @@
       display: none;
       margin-top: 12px;
       padding: 10px 14px;
-      background: rgba(255,92,92,0.1);
-      border: 1px solid rgba(255,92,92,0.3);
-      border-radius: 6px;
-      color: var(--red);
-      font-size: 12px;
+      background: rgba(255,69,58,0.1);
+      border: 1px solid rgba(255,69,58,0.3);
+      border-radius: var(--border-radius-md);
+      color: var(--color-danger);
+      font-size: var(--font-size-xs);
     }
 
-    /* ── Results ── */
     #results { display: none; }
 
-    /* Summary bar */
     .summary {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 20px;
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      padding: 12px 16px;
       display: flex;
       flex-direction: column;
       gap: 4px;
-      min-width: 120px;
+      min-width: 100px;
     }
 
     .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color-text);
       line-height: 1;
     }
 
     .stat-label {
-      font-size: 11px;
-      color: var(--muted);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.03em;
     }
 
     .badge {
       display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--border-radius-sm);
+      font-size: var(--font-size-xs);
+      font-weight: 500;
     }
 
     .badge-gtm {
-      background: rgba(91,127,255,0.15);
-      color: var(--accent);
-      border: 1px solid rgba(91,127,255,0.3);
+      background: rgba(0,122,255,0.15);
+      color: var(--color-accent);
+      border: 1px solid rgba(0,122,255,0.3);
     }
 
     .badge-no-gtm {
-      background: rgba(122,127,154,0.1);
-      color: var(--muted);
-      border: 1px solid var(--border);
+      background: var(--color-bg);
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
     }
 
-    /* Vendor breakdown */
     .section-title {
-      font-size: 11px;
+      font-size: var(--font-size-xs);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--muted);
-      margin-bottom: 12px;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 10px;
     }
 
     .vendors {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
 
     .vendor-chip {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 12px;
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      padding: 5px 10px;
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 12px;
+      font-size: var(--font-size-xs);
+      cursor: pointer;
+      transition: all 0.15s;
     }
 
-    .vendor-chip .vc-name { color: var(--text); }
+    .vendor-chip:hover {
+      border-color: var(--color-accent);
+      background: var(--color-bg-surface);
+    }
+
+    .vendor-chip.active {
+      border-color: var(--color-accent);
+      background: rgba(0,122,255,0.12);
+    }
+
+    .vendor-chip .vc-icon {
+      width: 14px;
+      height: 14px;
+      border-radius: 2px;
+      background: var(--color-bg);
+      flex-shrink: 0;
+    }
+
+    .vendor-chip .vc-name { color: var(--color-text-secondary); }
     .vendor-chip .vc-count {
-      background: var(--border);
-      color: var(--muted);
-      border-radius: 3px;
+      background: var(--color-bg);
+      color: var(--color-text-muted);
+      border-radius: var(--border-radius-sm);
       padding: 1px 6px;
-      font-size: 11px;
+      font-size: var(--font-size-xs);
     }
 
-    /* Scripts table */
+    .vendor-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .vendor-filter-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .vendor-filter-select {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      padding: 5px 10px;
+      color: var(--color-text);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      cursor: pointer;
+      outline: none;
+      min-width: 160px;
+    }
+
+    .vendor-filter-select:focus {
+      border-color: var(--color-accent);
+    }
+
+    .clear-vendor-filter {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-sm);
+      padding: 3px 8px;
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .clear-vendor-filter:hover {
+      color: var(--color-text);
+      border-color: var(--color-text-muted);
+    }
+
+    .clear-vendor-filter.visible {
+      display: inline-block;
+    }
+
     .table-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .filter-tabs {
       display: flex;
-      gap: 4px;
+      gap: 6px;
     }
 
     .filter-tab {
       background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 5px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
       padding: 5px 12px;
-      color: var(--muted);
-      font-family: var(--font);
-      font-size: 11px;
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
       cursor: pointer;
       transition: all 0.15s;
     }
 
     .filter-tab.active, .filter-tab:hover {
-      background: var(--surface2);
-      color: var(--text);
-      border-color: var(--accent);
+      background: var(--color-bg-surface);
+      color: var(--color-text);
+      border-color: var(--color-accent);
     }
 
     .table-wrap {
       overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
     }
 
     table {
@@ -288,85 +456,82 @@
     }
 
     thead tr {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      background: var(--color-bg-surface);
+      border-bottom: 1px solid var(--color-border);
     }
 
     th {
-      padding: 10px 14px;
+      padding: 10px 12px;
       text-align: left;
-      font-size: 11px;
+      font-size: var(--font-size-xs);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: var(--color-text-muted);
+      font-weight: 500;
       white-space: nowrap;
     }
 
     tbody tr {
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--color-border);
       transition: background 0.1s;
     }
 
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--surface2); }
-    tbody tr.via-gtm { background: rgba(91,127,255,0.04); }
-    tbody tr.via-gtm:hover { background: rgba(91,127,255,0.09); }
+    tbody tr:hover { background: var(--color-bg-elevated); }
+    tbody tr.via-gtm { background: rgba(0,122,255,0.04); }
+    tbody tr.via-gtm:hover { background: rgba(0,122,255,0.08); }
 
     td {
-      padding: 10px 14px;
-      font-size: 12px;
+      padding: 10px 12px;
+      font-size: var(--font-size-xs);
       vertical-align: middle;
     }
 
     td.url-cell {
-      max-width: 340px;
+      max-width: 300px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     td.url-cell a {
-      color: var(--muted);
+      color: var(--color-text-muted);
       text-decoration: none;
     }
 
-    td.url-cell a:hover { color: var(--accent); }
+    td.url-cell a:hover { color: var(--color-accent); }
 
     .tag {
       display: inline-block;
-      padding: 2px 7px;
-      border-radius: 4px;
+      padding: 2px 6px;
+      border-radius: var(--border-radius-sm);
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 500;
     }
 
-    .tag-external { background: rgba(61,214,140,0.1); color: var(--green); }
-    .tag-inline   { background: rgba(245,166,35,0.1);  color: var(--orange); }
-    .tag-gtm      { background: rgba(91,127,255,0.15); color: var(--accent); }
-    .tag-blocked  { background: rgba(255,92,92,0.12);  color: var(--red); border: 1px solid rgba(255,92,92,0.25); }
-    .tag-no       { color: var(--muted); }
+    .tag-external { background: rgba(48,209,88,0.1); color: var(--color-success); }
+    .tag-inline   { background: rgba(255,159,10,0.1);  color: var(--color-warning); }
+    .tag-gtm      { background: rgba(0,122,255,0.15); color: var(--color-accent); }
+    .tag-blocked  { background: rgba(255,69,58,0.12);  color: var(--color-danger); border: 1px solid rgba(255,69,58,0.25); }
+    .tag-no       { color: var(--color-text-muted); }
 
-    tbody tr.is-blocked { background: rgba(255,92,92,0.04); }
-    tbody tr.is-blocked:hover { background: rgba(255,92,92,0.08); }
+    tbody tr.is-blocked { background: rgba(255,69,58,0.04); }
+    tbody tr.is-blocked:hover { background: rgba(255,69,58,0.08); }
 
     .block-reason {
       display: block;
       font-size: 10px;
-      color: var(--red);
+      color: var(--color-danger);
       opacity: 0.85;
-      margin-top: 3px;
+      margin-top: 2px;
     }
 
     .scanned-at {
-      margin-top: 20px;
-      font-size: 11px;
-      color: var(--muted);
+      margin-top: 16px;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
       text-align: right;
     }
-
-    /* Hidden util */
-    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -374,10 +539,10 @@
 <header>
   <h1>Script Auditor</h1>
   <span>Detect all JS scripts loaded on a page, including GTM-injected ones</span>
+  <a href="http://localhost:8501" style="margin-left:auto;padding:4px 12px;border:1px solid var(--color-border);border-radius:var(--border-radius-md);color:var(--color-text-muted);text-decoration:none;font-size:var(--font-size-xs);transition:all 0.15s" onmouseover="this.style.borderColor='var(--color-accent)';this.style.color='var(--color-text)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-muted)'">V2 (Streamlit) →</a>
 </header>
 
 <main>
-  <!-- Input -->
   <div class="input-card">
     <div class="input-row">
       <input
@@ -395,7 +560,23 @@
         <option value="60">60s</option>
         <option value="90">90s</option>
       </select>
-      <button id="auditBtn" class="btn-audit" onclick="startAudit()">Audit</button>
+      <button id="auditBtn" class="btn-primary" onclick="startAudit()">Audit</button>
+    </div>
+
+    <div class="interaction-options">
+      <span class="interaction-title">User interactions:</span>
+      <label>
+        <input type="checkbox" id="clickConsent" checked />
+        Click cookie consent
+      </label>
+      <label>
+        <input type="checkbox" id="scrollPage" checked />
+        Scroll page
+      </label>
+      <label>
+        Scroll count:
+        <input type="number" id="scrollCount" value="3" min="1" max="10" />
+      </label>
     </div>
 
     <div id="progress">
@@ -406,9 +587,7 @@
     <div id="errorMsg" class="error-msg"></div>
   </div>
 
-  <!-- Results -->
   <div id="results">
-    <!-- Summary -->
     <div class="summary">
       <div class="stat">
         <span class="stat-value" id="totalCount">0</span>
@@ -427,7 +606,7 @@
         <span class="stat-label">Via GTM</span>
       </div>
       <div class="stat">
-        <span class="stat-value" id="blockedCount" style="color:var(--red)">0</span>
+        <span class="stat-value" id="blockedCount" style="color:var(--color-danger)">0</span>
         <span class="stat-label">Blocked</span>
       </div>
       <div class="stat" id="gtmStat">
@@ -436,11 +615,9 @@
       </div>
     </div>
 
-    <!-- Vendor breakdown -->
     <p class="section-title">Vendors detected</p>
     <div id="vendorChips" class="vendors"></div>
 
-    <!-- Scripts table -->
     <div class="table-header">
       <p class="section-title" style="margin:0">All scripts</p>
       <div class="filter-tabs">
@@ -452,6 +629,14 @@
       </div>
     </div>
 
+    <div class="vendor-filter-bar">
+      <span class="vendor-filter-label">Filter by vendor:</span>
+      <select id="vendorFilter" class="vendor-filter-select" onchange="applyFilters()">
+        <option value="all">All vendors</option>
+      </select>
+      <button class="clear-vendor-filter" id="clearVendorFilter" onclick="clearVendorFilter()">Clear</button>
+    </div>
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -461,6 +646,7 @@
             <th>Type</th>
             <th>Via GTM</th>
             <th>Blocked</th>
+            <th>Domain</th>
             <th>URL</th>
           </tr>
         </thead>
@@ -474,8 +660,88 @@
 
 <script>
   let currentFilter = 'all';
+  let currentVendor = 'all';
   let allScripts = [];
   let activeSource = null;
+
+  const VENDOR_ICONS = {
+    'Google': 'https://www.google.com/favicon.ico',
+    'Google Ads': 'https://www.google.com/favicon.ico',
+    'Google Ads (DoubleClick)': 'https://www.google.com/favicon.ico',
+    'Google Tag Manager': 'https://www.google.com/favicon.ico',
+    'Google Analytics (UA)': 'https://www.google.com/favicon.ico',
+    'Google Analytics (Legacy)': 'https://www.google.com/favicon.ico',
+    'Google Analytics 4 (gtag)': 'https://www.google.com/favicon.ico',
+    'Google Optimize': 'https://www.google.com/favicon.ico',
+    'Google Hosted Libraries': 'https://www.google.com/favicon.ico',
+    'Facebook Pixel': 'https://www.facebook.com/favicon.ico',
+    'Facebook / Meta SDK': 'https://www.facebook.com/favicon.ico',
+    'Microsoft': 'https://www.microsoft.com/favicon.ico',
+    'Microsoft Clarity': 'https://www.microsoft.com/favicon.ico',
+    'Apple': 'https://www.apple.com/favicon.ico',
+    'Adobe': 'https://www.adobe.com/favicon.ico',
+    'Cloudflare': 'https://www.cloudflare.com/favicon.ico',
+    'Cloudflare CDNJS': 'https://www.cloudflare.com/favicon.ico',
+    'Amazon': 'https://www.amazon.com/favicon.ico',
+    'Shopify': 'https://www.shopify.com/favicon.ico',
+    'Stripe': 'https://www.stripe.com/favicon.ico',
+    'HubSpot': 'https://www.hubspot.com/favicon.ico',
+    'Salesforce': 'https://www.salesforce.com/favicon.ico',
+    'Zendesk': 'https://www.zendesk.com/favicon.ico',
+    'Intercom': 'https://www.intercom.com/favicon.ico',
+    'Drift': 'https://www.drift.com/favicon.ico',
+    'Hotjar': 'https://www.hotjar.com/favicon.ico',
+    'Segment': 'https://www.segment.com/favicon.ico',
+    'Mixpanel': 'https://www.mixpanel.com/favicon.ico',
+    'Amplitude': 'https://www.amplitude.com/favicon.ico',
+    'Heap': 'https://www.heap.io/favicon.ico',
+    'FullStory': 'https://www.fullstory.com/favicon.ico',
+    'Pendo': 'https://www.pendo.io/favicon.ico',
+    'PostHog': 'https://www.posthog.com/favicon.ico',
+    'Sentry': 'https://www.sentry.io/favicon.ico',
+    'Datadog': 'https://www.datadog.com/favicon.ico',
+    'New Relic': 'https://www.newrelic.com/favicon.ico',
+    'OneTrust': 'https://www.onetrust.com/favicon.ico',
+    'OneTrust (CMP)': 'https://www.onetrust.com/favicon.ico',
+    'Cookiebot': 'https://www.cookiebot.com/favicon.ico',
+    'Cookiebot (CMP)': 'https://www.cookiebot.com/favicon.ico',
+    'Didomi': 'https://www.didomi.io/favicon.ico',
+    'Didomi (CMP)': 'https://www.didomi.io/favicon.ico',
+    'Crisp': 'https://www.crisp.chat/favicon.ico',
+    'LinkedIn': 'https://www.linkedin.com/favicon.ico',
+    'LinkedIn Insight Tag': 'https://www.linkedin.com/favicon.ico',
+    'Twitter/X Ads Pixel': 'https://www.twitter.com/favicon.ico',
+    'Twitter/X Platform': 'https://www.twitter.com/favicon.ico',
+    'Pinterest Tag': 'https://www.pinterest.com/favicon.ico',
+    'TikTok Pixel': 'https://www.tiktok.com/favicon.ico',
+    'Criteo': 'https://www.criteo.com/favicon.ico',
+    'Outbrain': 'https://www.outbrain.com/favicon.ico',
+    'Quantcast': 'https://www.quantcast.com/favicon.ico',
+    'Taboola': 'https://www.taboola.com/favicon.ico',
+    'Yandex': 'https://www.yandex.com/favicon.ico',
+    'Baidu': 'https://www.baidu.com/favicon.ico',
+    'Alibaba': 'https://www.alibaba.com/favicon.ico',
+    'Fastly': 'https://www.fastly.com/favicon.ico',
+    'Akamai': 'https://www.akamai.com/favicon.ico',
+    'Vercel': 'https://www.vercel.com/favicon.ico',
+    'jQuery (CDN)': 'https://www.jquery.com/favicon.ico',
+    'unpkg CDN': 'https://www.unpkg.com/favicon.ico',
+    'jsDelivr CDN': 'https://www.jsdelivr.com/favicon.ico',
+  };
+
+  function getVendorIcon(vendor) {
+    return VENDOR_ICONS[vendor] || null;
+  }
+
+  function extractDomain(url) {
+    if (url === 'inline') return 'inline';
+    try {
+      const u = new URL(url);
+      return u.hostname;
+    } catch {
+      return url;
+    }
+  }
 
   function startAudit() {
     const url = document.getElementById('urlInput').value.trim();
@@ -485,9 +751,13 @@
       return;
     }
 
-    const timeout = parseInt(document.getElementById('timeoutSelect').value, 10);
+    localStorage.setItem('scriptAuditor_lastUrl', url);
 
-    // Reset UI
+    const timeout = parseInt(document.getElementById('timeoutSelect').value, 10);
+    const clickConsent = document.getElementById('clickConsent').checked;
+    const scroll = document.getElementById('scrollPage').checked;
+    const scrollCount = parseInt(document.getElementById('scrollCount').value, 10) || 3;
+
     hideError();
     hideResults();
     showProgress('Starting audit...');
@@ -498,7 +768,13 @@
     fetch('/audit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, timeout }),
+      body: JSON.stringify({
+        url,
+        timeout,
+        click_consent: clickConsent,
+        scroll,
+        scroll_count: scrollCount,
+      }),
     })
     .then(r => r.json())
     .then(({ job_id, error }) => {
@@ -552,7 +828,6 @@
     allScripts = data.scripts || [];
     currentFilter = 'all';
 
-    // Activate "All" tab
     document.querySelectorAll('.filter-tab').forEach((t, i) => {
       t.classList.toggle('active', i === 0);
     });
@@ -577,19 +852,25 @@
       badge.className = 'badge badge-no-gtm';
     }
 
-    // Vendor chips
     const vendorCounts = {};
     allScripts.forEach(s => {
       vendorCounts[s.vendor] = (vendorCounts[s.vendor] || 0) + 1;
     });
     const sorted = Object.entries(vendorCounts).sort((a, b) => b[1] - a[1]);
     const chipsEl = document.getElementById('vendorChips');
-    chipsEl.innerHTML = sorted.map(([vendor, count]) => `
-      <div class="vendor-chip">
+    chipsEl.innerHTML = sorted.map(([vendor, count]) => {
+      const icon = getVendorIcon(vendor);
+      const iconHtml = icon ? `<img class="vc-icon" src="${icon}" alt="" onerror="this.style.display='none'" />` : '';
+      return `<div class="vendor-chip" onclick="filterByVendor('${esc(vendor)}', this)">
+        ${iconHtml}
         <span class="vc-name">${esc(vendor)}</span>
         <span class="vc-count">${count}</span>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
+
+    const vendorSelect = document.getElementById('vendorFilter');
+    vendorSelect.innerHTML = '<option value="all">All vendors</option>' +
+      sorted.map(([vendor]) => `<option value="${esc(vendor)}">${esc(vendor)}</option>`).join('');
 
     renderTable(allScripts);
 
@@ -600,7 +881,7 @@
   function renderTable(scripts) {
     const tbody = document.getElementById('scriptsBody');
     if (!scripts.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--muted);padding:20px;text-align:center">No scripts found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="color:var(--color-text-muted);padding:20px;text-align:center">No scripts found</td></tr>';
       return;
     }
     tbody.innerHTML = scripts.map(s => {
@@ -625,36 +906,89 @@
         ? `${esc(s.name)}<span class="block-reason">${esc(s.block_reason)}</span>`
         : esc(s.name);
 
+      const icon = getVendorIcon(s.vendor);
+      const vendorCell = icon
+        ? `<img class="vc-icon" src="${icon}" alt="" onerror="this.style.display='none'" style="width:14px;height:14px;border-radius:2px;vertical-align:middle;margin-right:6px" />${esc(s.vendor)}`
+        : esc(s.vendor);
+
+      const domain = extractDomain(s.url);
+      const domainCell = domain === 'inline'
+        ? '<span style="color:var(--color-text-muted)">inline</span>'
+        : `<span style="color:var(--color-text-secondary)">${esc(domain)}</span>`;
+
       const urlCell = s.url === 'inline'
-        ? '<span style="color:var(--muted)">inline</span>'
+        ? '<span style="color:var(--color-text-muted)">inline</span>'
         : `<a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.url)}">${esc(s.url)}</a>`;
 
       return `<tr class="${rowClass}">
         <td>${nameCell}</td>
-        <td>${esc(s.vendor)}</td>
+        <td>${vendorCell}</td>
         <td>${typeTag}</td>
         <td>${gtmTag}</td>
         <td>${blockedTag}</td>
+        <td>${domainCell}</td>
         <td class="url-cell">${urlCell}</td>
       </tr>`;
     }).join('');
+  }
+
+  function filterByVendor(vendor, chipEl) {
+    currentVendor = vendor;
+    document.getElementById('vendorFilter').value = vendor;
+    document.getElementById('clearVendorFilter').classList.add('visible');
+
+    document.querySelectorAll('.vendor-chip').forEach(c => c.classList.remove('active'));
+    if (chipEl) chipEl.classList.add('active');
+
+    applyFilters();
+  }
+
+  function clearVendorFilter() {
+    currentVendor = 'all';
+    document.getElementById('vendorFilter').value = 'all';
+    document.getElementById('clearVendorFilter').classList.remove('visible');
+    document.querySelectorAll('.vendor-chip').forEach(c => c.classList.remove('active'));
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const selectVal = document.getElementById('vendorFilter').value;
+    if (selectVal !== 'all') {
+      currentVendor = selectVal;
+      document.getElementById('clearVendorFilter').classList.add('visible');
+      document.querySelectorAll('.vendor-chip').forEach(c => {
+        c.classList.toggle('active', c.querySelector('.vc-name')?.textContent === currentVendor);
+      });
+    } else if (currentVendor !== 'all') {
+      currentVendor = 'all';
+      document.getElementById('clearVendorFilter').classList.remove('visible');
+      document.querySelectorAll('.vendor-chip').forEach(c => c.classList.remove('active'));
+    }
+
+    let filtered = allScripts;
+
+    if (currentVendor !== 'all') {
+      filtered = filtered.filter(s => s.vendor === currentVendor);
+    }
+
+    if (currentFilter === 'gtm') {
+      filtered = filtered.filter(s => s.via_gtm);
+    } else if (currentFilter === 'blocked') {
+      filtered = filtered.filter(s => s.blocked);
+    } else if (currentFilter !== 'all') {
+      filtered = filtered.filter(s => s.type === currentFilter);
+    }
+
+    renderTable(filtered);
   }
 
   function setFilter(filter, btn) {
     currentFilter = filter;
     document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
-
-    let filtered;
-    if (filter === 'all')         filtered = allScripts;
-    else if (filter === 'gtm')    filtered = allScripts.filter(s => s.via_gtm);
-    else if (filter === 'blocked') filtered = allScripts.filter(s => s.blocked);
-    else                           filtered = allScripts.filter(s => s.type === filter);
-
-    renderTable(filtered);
+    applyFilters();
   }
 
-  // ── UI helpers ──
   function showProgress(msg) {
     setStatus(msg);
     document.getElementById('progress').style.display = 'flex';
@@ -687,10 +1021,15 @@
       .replace(/"/g, '&quot;');
   }
 
-  // Allow Enter key to submit
   document.getElementById('urlInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') startAudit();
   });
+
+  // Restore last URL from localStorage
+  const savedUrl = localStorage.getItem('scriptAuditor_lastUrl');
+  if (savedUrl) {
+    document.getElementById('urlInput').value = savedUrl;
+  }
 </script>
 </body>
 </html>

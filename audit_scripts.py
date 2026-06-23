@@ -30,6 +30,61 @@ _FILTERED_URL_FRAGMENTS = [
     "googletagmanager.com/debug",
 ]
 
+_CONSENT_SELECTORS = [
+    "[id*='accept'][id*='cookie']",
+    "[id*='cookie'][id*='accept']",
+    "[class*='accept'][class*='cookie']",
+    "[class*='cookie'][class*='accept']",
+    "[id*='accept-cookies']",
+    "[class*='accept-cookies']",
+    "button[id*='accept']",
+    "button[class*='accept']",
+    "a[id*='accept']",
+    "a[class*='accept']",
+    "[id*='agree']",
+    "[class*='agree']",
+    "button[id*='consent']",
+    "button[class*='consent']",
+    "[id*='cc-accept']",
+    "[class*='cc-accept']",
+    "[id*='gdpr-accept']",
+    "[class*='gdpr-accept']",
+    "[aria-label*='accept']",
+    "[aria-label*='Accept']",
+    "[aria-label*='agree']",
+    "[aria-label*='Agree']",
+    "[aria-label*='consent']",
+    "[aria-label*='Consent']",
+    "button:has-text('Accept')",
+    "button:has-text('Accept All')",
+    "button:has-text('Accept all')",
+    "button:has-text('I accept')",
+    "button:has-text('I Accept')",
+    "button:has-text('Agree')",
+    "button:has-text('I agree')",
+    "button:has-text('I Agree')",
+    "button:has-text('OK')",
+    "button:has-text('Okay')",
+    "button:has-text('Continue')",
+    "a:has-text('Accept')",
+    "a:has-text('Agree')",
+    "[data-testid*='accept']",
+    "[data-testid*='consent']",
+    "[data-testid*='agree']",
+    "#onetrust-accept-btn-handler",
+    ".accept-cookies",
+    ".cc-accept",
+    ".cc-dismiss",
+    "#cookie-accept",
+    "#cookies-accept",
+    "#accept-cookies",
+    "#acceptCookies",
+    "#accept-cookie",
+    ".cookie-consent-accept",
+    "#consent-accept",
+    ".consent-accept",
+]
+
 
 # ---------------------------------------------------------------------------
 # Pure helpers
@@ -128,6 +183,59 @@ def classify_page_error(raw: str) -> str:
     return raw
 
 
+def try_click_consent_banner(page: Page) -> bool:
+    """Attempt to click a cookie consent/cookie banner accept button.
+    Returns True if a button was clicked.
+    """
+    for selector in _CONSENT_SELECTORS:
+        try:
+            el = page.query_selector(selector)
+            if el and el.is_visible():
+                el.click(timeout=1000)
+                page.wait_for_timeout(500)
+                return True
+        except Exception:
+            continue
+    return False
+
+
+def perform_scroll(page: Page, scroll_count: int =3, scroll_delay: int = 800) -> None:
+    """Scroll the page to trigger lazy-loaded scripts."""
+    for i in range(scroll_count):
+        try:
+            page.evaluate(f"window.scrollTo(0, document.body.scrollHeight * {(i +1) / scroll_count})")
+            page.wait_for_timeout(scroll_delay)
+        except Exception:
+            break
+
+
+def perform_interactions(
+    page: Page,
+    interactions: dict,
+    captured_requests: list,
+    failed_requests: dict,
+    gtm_detected: bool
+) -> bool:
+    """Perform user interactions on the page.
+    interactions: dict with keys 'click_consent', 'scroll', 'scroll_count'
+    Returns True if any interaction triggered new scripts.
+    """
+    initial_count = len(captured_requests)
+    did_interact = False
+
+    if interactions.get('click_consent', True):
+        if try_click_consent_banner(page):
+            did_interact = True
+            page.wait_for_timeout(1000)
+
+    if interactions.get('scroll', True):
+        scroll_count = interactions.get('scroll_count', 3)
+        perform_scroll(page, scroll_count)
+        did_interact = True
+
+    return did_interact and len(captured_requests) > initial_count
+
+
 def build_script_record(
     url: str, name: str, vendor: str, via_gtm: bool, script_type: str,
     blocked: bool = False, block_reason: str = None
@@ -185,8 +293,17 @@ def get_dom_script_urls(page: Page) -> set:
 # Core audit
 # ---------------------------------------------------------------------------
 
-def audit_url(url: str, browser: Browser, timeout_ms: int) -> dict:
-    """Audit a single URL and return a result dict."""
+def audit_url(
+    url: str,
+    browser: Browser,
+    timeout_ms: int,
+    interactions: dict = None
+) -> dict:
+    """Audit a single URL and return a result dict.
+    interactions: dict with 'click_consent', 'scroll', 'scroll_count' keys
+    """
+    if interactions is None:
+        interactions = {'click_consent': True, 'scroll': True, 'scroll_count': 3}
     context = browser.new_context(
         user_agent=(
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -245,6 +362,9 @@ def audit_url(url: str, browser: Browser, timeout_ms: int) -> dict:
             "error": classify_page_error(str(e)),
             "scripts": [],
         }
+
+    # Perform user interactions to trigger blocked scripts
+    perform_interactions(page, interactions, captured_requests, failed_requests, gtm_detected)
 
     # Extra buffer for late-firing GTM tags
     try:
@@ -400,6 +520,23 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Print a table of all detected scripts per URL",
     )
+    parser.add_argument(
+        "--no-click-consent",
+        action="store_true",
+        help="Disable automatic clicking of cookie consent banners",
+    )
+    parser.add_argument(
+        "--no-scroll",
+        action="store_true",
+        help="Disable automatic page scrolling to trigger lazy-loaded scripts",
+    )
+    parser.add_argument(
+        "--scroll-count",
+        type=int,
+        default=3,
+        metavar="N",
+        help="Number of scroll steps (default: 3)",
+    )
     return parser.parse_args()
 
 
@@ -448,12 +585,18 @@ def run_audit(urls: list, args: argparse.Namespace) -> None:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_path = args.output or f"output/audit_{timestamp}.json"
 
+    interactions = {
+        'click_consent': not args.no_click_consent,
+        'scroll': not args.no_scroll,
+        'scroll_count': args.scroll_count,
+    }
+
     results = []
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=headless)
+        browser = pw.chromium.launch(headless=headless, channel="chrome")
         try:
             for i, url in enumerate(urls, start=1):
-                result = audit_url(url, browser, timeout_ms)
+                result = audit_url(url, browser, timeout_ms, interactions)
                 results.append(result)
                 print_result(result, args.verbose, index=i, total=total)
         except KeyboardInterrupt:

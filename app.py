@@ -32,15 +32,17 @@ def _send(q: queue.Queue, event_type: str, **kwargs):
 # thread-safe and cannot be shared across threads.
 # ---------------------------------------------------------------------------
 
-def run_audit_job(job_id: str, url: str, timeout_ms: int):
+def run_audit_job(job_id: str, url: str, timeout_ms: int, interactions: dict = None):
     q = _jobs[job_id]
     try:
         _send(q, "status", message="Launching browser...")
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
+            browser = pw.chromium.launch(headless=True, channel="chrome", args=["--no-sandbox", "--disable-dev-shm-usage"])
             try:
                 _send(q, "status", message=f"Connecting to {url} ...")
-                result = audit_url(url, browser, timeout_ms)
+                if interactions and (interactions.get('click_consent') or interactions.get('scroll')):
+                    _send(q, "status", message="Performing interactions...")
+                result = audit_url(url, browser, timeout_ms, interactions)
             finally:
                 browser.close()
 
@@ -77,12 +79,18 @@ def start_audit():
     timeout_sec = int(body.get("timeout", 30))
     timeout_ms = max(5, min(timeout_sec, 120)) * 1000
 
+    interactions = {
+        'click_consent': body.get('click_consent', True),
+        'scroll': body.get('scroll', True),
+        'scroll_count': int(body.get('scroll_count', 3)),
+    }
+
     job_id = str(uuid.uuid4())
     q: queue.Queue = queue.Queue()
     with _jobs_lock:
         _jobs[job_id] = q
 
-    t = threading.Thread(target=run_audit_job, args=(job_id, url, timeout_ms), daemon=True)
+    t = threading.Thread(target=run_audit_job, args=(job_id, url, timeout_ms, interactions), daemon=True)
     t.start()
 
     return jsonify({"job_id": job_id})
