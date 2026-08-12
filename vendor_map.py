@@ -148,7 +148,7 @@ def _load_vendor_db() -> dict:
 
 def _extract_domain(url: str) -> str:
     """Extract registrable domain from URL."""
-    if url == "inline":
+    if url == "inline" or url.startswith("data:"):
         return ""
     try:
         host = urlparse(url).hostname

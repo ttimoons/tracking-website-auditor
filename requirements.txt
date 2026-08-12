@@ -2,3 +2,7 @@ playwright>=1.40.0
 flask>=3.0.0
 streamlit>=1.40.0
 gunicorn>=21.0.0
+libsql-client>=0.3.0
+python-dotenv>=1.0.0
+certifi>=2023.0.0
+

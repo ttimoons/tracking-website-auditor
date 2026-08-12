@@ -15,36 +15,6 @@
   <link rel="manifest" href="/static/manifest.json">
   <meta name="theme-color" content="#F1EFE8">
   <meta name="application-name" content="Script Auditor">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Script Auditor",
-    "description": "Detect all JavaScript scripts loaded on a webpage, including GTM-injected ones. Identifies vendor, type, and blocked status.",
-    "url": "http://localhost:7070",
-    "applicationCategory": "DeveloperApplication",
-    "operatingSystem": "Any",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "author": {
-      "@type": "Organization",
-      "name": "Script Auditor"
-    },
-    "browserRequirements": "Requires JavaScript",
-    "softwareVersion": "2.0.0",
-    "featureList": [
-      "JavaScript script detection",
-      "Google Tag Manager script detection",
-      "Vendor identification",
-      "Cookie consent interaction",
-      "Scroll-triggered script detection",
-      "Blocked script detection"
-    ]
-  }
-  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -95,180 +65,207 @@
       letter-spacing: -0.01em;
       min-height: 100vh;
       line-height: 1.5;
-      /* faint engineering-paper grid — opaque cards cover it */
       background-image:
         linear-gradient(rgba(44, 44, 42, 0.035) 1px, transparent 1px),
         linear-gradient(90deg, rgba(44, 44, 42, 0.035) 1px, transparent 1px);
       background-size: 28px 28px;
     }
 
-    /* Small uppercase code-comment label — the signature accent of this system */
-    .mono { font-family: var(--font-mono); letter-spacing: 0.04em; }
-
     header {
-      padding: 18px 24px;
+      padding: 16px 24px;
       border-bottom: 1px solid var(--border);
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 12px;
       background: var(--bg-card);
     }
 
-    header h1 {
-      font-family: var(--font-display);
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--text-main);
-      letter-spacing: -0.035em;
+    /* Centered Navigation Pills */
+    .top-nav-tabs {
+      display: inline-flex;
+      background: rgba(44, 44, 42, 0.06);
+      border: 1px solid var(--border-faint);
+      padding: 4px;
+      border-radius: 0.75rem;
+      gap: 6px;
     }
 
-    header .tagline {
+    .nav-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 0.55rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-tab:hover {
+      color: var(--text-main);
+      background: rgba(44, 44, 42, 0.05);
+    }
+
+    .nav-tab.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 2px 4px rgba(12, 68, 124, 0.25);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+    }
+
+    .tab-view { display: none; }
+    .tab-view.active { display: block; }
+
+    /* Page Hero Titles */
+    .page-hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .page-hero h1 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      color: var(--text-main);
+    }
+
+    .page-hero .subtitle {
       font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--text-muted);
+      margin-top: 4px;
     }
 
-    .header-cta {
-      margin-left: auto;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: var(--primary);
-      color: var(--sand);
-      font-family: var(--font-display);
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-decoration: none;
-      white-space: nowrap;
-      padding: 0.5rem 0.85rem;
-      border-radius: var(--radius-md);
-      transition: background 0.15s ease, transform 0.15s ease;
-    }
-    .header-cta:hover { background: var(--primary-hover); transform: translateY(-1px); }
-
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
+    /* Cards */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
+      padding: 20px 24px;
       box-shadow: 0 1px 0 rgba(44, 44, 42, 0.04);
-    }
-
-    .input-card {
-      padding: 20px;
       margin-bottom: 24px;
     }
 
     .input-row {
       display: flex;
-      gap: 8px;
+      gap: 12px;
       align-items: center;
     }
 
     .control-input {
-      background: var(--field);
+      background-color: var(--field);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 0.7rem 0.9rem;
-      color: var(--text-main);
+      padding: 10px 14px;
       font-family: var(--font-mono);
       font-size: var(--font-size-sm);
-      outline: none;
-      appearance: none;
+      color: var(--text-main);
       transition: border-color 0.15s, box-shadow 0.15s;
     }
 
+    .url-input { flex: 1; }
     .control-input:focus {
+      outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 2px rgba(12, 68, 124, 0.12);
     }
 
-    .url-input { flex: 1; }
-    .url-input::placeholder { color: var(--text-muted); }
+    /* Fixed https:// URL Input Group */
+    .url-input-group {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      background-color: var(--field);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
 
-    select.control-input {
-      cursor: pointer;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235F5E5A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.85rem center;
-      padding-right: 2.3rem;
+    .url-input-group:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(12, 68, 124, 0.12);
+    }
+
+    .url-prefix {
+      background: rgba(12, 68, 124, 0.08);
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      padding: 10px 12px;
+      border-right: 1px solid var(--border-faint);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .url-input-group .url-input {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+      flex: 1;
+      padding: 10px 12px;
     }
 
     .btn-primary {
-      background: var(--primary);
+      background-color: var(--primary);
       color: var(--sand);
       border: none;
       border-radius: var(--radius-md);
-      padding: 0.7rem 1.4rem;
+      padding: 10px 20px;
       font-family: var(--font-display);
       font-size: var(--font-size-sm);
       font-weight: 700;
       cursor: pointer;
-      transition: background 0.15s, transform 0.15s;
-      white-space: nowrap;
+      transition: background-color 0.15s, transform 0.15s;
     }
 
-    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
-    .btn-primary:disabled { opacity: 0.45; cursor: default; transform: none; }
+    .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: var(--field);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-secondary:hover { background: var(--bg-dark); border-color: var(--primary); }
 
     .interaction-options {
-      margin-top: 16px;
-      padding: 14px 16px;
-      background: var(--field);
-      border: 1px solid var(--border-faint);
-      border-radius: var(--radius-md);
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .interaction-options label {
       display: flex;
       align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      font-size: var(--font-size-xs);
-      color: var(--text-main);
-    }
-
-    .interaction-options input[type="checkbox"] {
-      width: 14px;
-      height: 14px;
-      accent-color: var(--primary);
-      cursor: pointer;
-    }
-
-    .interaction-options input[type="number"] {
-      width: 52px;
-      background: var(--field);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 4px 8px;
-      color: var(--text-main);
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      outline: none;
-    }
-
-    .interaction-options input[type="number"]:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(12, 68, 124, 0.12);
+      gap: 18px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-faint);
     }
 
     .interaction-title {
       font-family: var(--font-mono);
       font-size: var(--font-size-xs);
-      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
     }
 
     #progress {
@@ -276,240 +273,70 @@
       align-items: center;
       gap: 12px;
       margin-top: 16px;
-      color: var(--text-muted);
+      padding: 12px 16px;
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
       font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
+      font-size: var(--font-size-sm);
     }
 
     .spinner {
-      width: 14px;
-      height: 14px;
+      width: 16px; height: 16px;
       border: 2px solid var(--border);
       border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .error-msg {
-      display: none;
-      margin-top: 12px;
-      padding: 10px 14px;
-      background: rgba(216, 90, 48, 0.08);
-      border: 1px solid rgba(216, 90, 48, 0.3);
-      border-radius: var(--radius-md);
-      color: var(--error);
-      font-size: var(--font-size-xs);
-    }
-
-    #results { display: none; }
-
+    /* Summary KPI Grid */
     .summary {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
     .stat {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      box-shadow: 0 1px 0 rgba(44, 44, 42, 0.04);
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 110px;
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
     }
 
     .kpi-value {
       font-family: var(--font-display);
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 700;
       letter-spacing: -0.04em;
       color: var(--text-main);
-      line-height: 1;
+      display: block;
     }
 
     .kpi-label {
       font-family: var(--font-mono);
       font-size: var(--font-size-xs);
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      font-weight: 500;
-    }
-
-    .badge-gtm {
-      background: rgba(12, 68, 124, 0.1);
-      color: var(--primary);
-      border: 1px solid rgba(12, 68, 124, 0.3);
-    }
-
-    .badge-no-gtm {
-      background: var(--field);
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-
-    .section-title {
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--text-muted);
-      margin-bottom: 10px;
     }
 
-    .vendors {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
+    /* Vendor Pills & Badges */
+    .vendors { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
     .vendor-chip {
-      background: var(--field);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 5px 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      cursor: pointer;
-      transition: all 0.15s;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: var(--radius-md);
+      border: 1px solid var(--border); background: var(--field);
+      font-family: var(--font-mono); font-size: var(--font-size-xs);
+      cursor: pointer; transition: all 0.15s;
     }
+    .vendor-chip:hover { border-color: var(--primary); background: var(--bg-card); }
+    .vendor-chip.active { border-color: var(--primary); background: rgba(12, 68, 124, 0.1); }
+    .vc-icon { width: 14px; height: 14px; border-radius: 2px; }
+    .vc-count { opacity: 0.65; }
 
-    .vendor-chip:hover {
-      border-color: var(--primary);
-      background: var(--bg-card);
-    }
-
-    .vendor-chip.active {
-      border-color: var(--primary);
-      background: rgba(12, 68, 124, 0.08);
-    }
-
-    .vendor-chip .vc-icon {
-      width: 14px;
-      height: 14px;
-      border-radius: 2px;
-      background: var(--bg-dark);
-      flex-shrink: 0;
-    }
-
-    .vendor-chip .vc-name { color: var(--text-main); }
-    .vendor-chip .vc-count {
-      background: var(--bg-dark);
-      color: var(--text-muted);
-      border-radius: var(--radius-sm);
-      padding: 1px 6px;
-      font-size: var(--font-size-xs);
-    }
-
-    .vendor-filter-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .vendor-filter-label {
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      white-space: nowrap;
-    }
-
-    .vendor-filter-select {
-      background: var(--field);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 5px 10px;
-      color: var(--text-main);
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      cursor: pointer;
-      outline: none;
-      min-width: 160px;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235F5E5A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      padding-right: 2rem;
-    }
-
-    .vendor-filter-select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(12, 68, 124, 0.12);
-    }
-
-    .clear-vendor-filter {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 3px 8px;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      cursor: pointer;
-      display: none;
-    }
-
-    .clear-vendor-filter:hover {
-      color: var(--text-main);
-      border-color: var(--text-muted);
-    }
-
-    .clear-vendor-filter.visible {
-      display: inline-block;
-    }
-
-    .table-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .filter-tabs {
-      display: flex;
-      gap: 6px;
-    }
-
-    .filter-tab {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 5px 12px;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .filter-tab.active, .filter-tab:hover {
-      background: var(--field);
-      color: var(--text-main);
-      border-color: var(--primary);
-    }
-
+    /* Table Styles */
     .table-wrap {
       overflow-x: auto;
       border: 1px solid var(--border);
@@ -517,319 +344,330 @@
       background: var(--bg-card);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    thead tr {
-      background: var(--field);
-      border-bottom: 1px solid var(--border);
-    }
-
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--field); border-bottom: 1px solid var(--border); }
     th {
-      padding: 10px 12px;
-      text-align: left;
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      font-weight: 500;
-      white-space: nowrap;
+      padding: 10px 14px; text-align: left;
+      font-family: var(--font-mono); font-size: var(--font-size-xs);
+      text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--text-muted); font-weight: 600; white-space: nowrap;
     }
-
-    tbody tr {
-      border-bottom: 1px solid var(--border-faint);
-      transition: background 0.1s;
-    }
-
-    tbody tr:last-child { border-bottom: none; }
+    tbody tr { border-bottom: 1px solid var(--border-faint); transition: background 0.1s; }
     tbody tr:hover { background: rgba(44, 44, 42, 0.025); }
-    tbody tr.via-gtm { background: rgba(12, 68, 124, 0.04); }
-    tbody tr.via-gtm:hover { background: rgba(12, 68, 124, 0.08); }
-
-    td {
-      padding: 10px 12px;
-      font-family: var(--font-mono);
-      font-size: var(--font-size-xs);
-      vertical-align: middle;
-    }
-
-    td.url-cell {
-      max-width: 300px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    td.url-cell a {
-      color: var(--text-muted);
-      text-decoration: none;
-    }
-
-    td.url-cell a:hover { color: var(--primary); }
+    td { padding: 10px 14px; font-family: var(--font-mono); font-size: var(--font-size-xs); vertical-align: middle; }
 
     .tag {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
+      display: inline-block; padding: 2px 6px; border-radius: var(--radius-sm);
+      font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.03em;
     }
-
     .tag-external { background: rgba(29, 158, 117, 0.12); color: var(--accent); }
     .tag-inline   { background: rgba(186, 117, 23, 0.12); color: var(--amber); }
     .tag-gtm      { background: rgba(12, 68, 124, 0.12); color: var(--primary); }
     .tag-blocked  { background: rgba(216, 90, 48, 0.12); color: var(--error); border: 1px solid rgba(216, 90, 48, 0.25); }
     .tag-no       { color: var(--text-muted); }
 
-    tbody tr.is-blocked { background: rgba(216, 90, 48, 0.04); }
-    tbody tr.is-blocked:hover { background: rgba(216, 90, 48, 0.08); }
-
-    .block-reason {
-      display: block;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--error);
-      opacity: 0.85;
-      margin-top: 2px;
+    /* Database Viewer Layout */
+    .db-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 20px;
     }
 
-    .scanned-at {
+    .db-sidebar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      height: fit-content;
+    }
+
+    .table-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--field);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .table-list-item.active { background: var(--primary); color: #FFF; border-color: var(--primary); }
+
+    .table-badge {
+      background: rgba(12, 68, 124, 0.12);
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+    .table-list-item.active .table-badge { background: rgba(255, 255, 255, 0.2); color: #FFF; }
+
+    .db-main {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .column-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 16px;
+    }
+
+    .col-badge {
+      background: var(--field);
+      border: 1px solid var(--border-faint);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .pagination-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-faint);
       font-family: var(--font-mono);
       font-size: var(--font-size-xs);
       color: var(--text-muted);
-      text-align: right;
     }
+
+    /* Modal / Inspector Drawer */
+    .modal-backdrop {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4); z-index: 999; display: none;
+      align-items: center; justify-content: center;
+    }
+    .modal-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); width: 90%; max-width: 800px;
+      max-height: 85vh; display: flex; flex-direction: column;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-body { padding: 20px; overflow-y: auto; font-family: var(--font-mono); font-size: 0.8rem; }
+    pre { white-space: pre-wrap; word-break: break-all; }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Script Auditor</h1>
-  <span class="tagline">// detect all JS loaded on a page, incl. GTM-injected</span>
-  <a href="http://localhost:8501" class="header-cta">V2 (Streamlit) →</a>
+  <div class="top-nav-tabs">
+    <button class="nav-tab active" id="tabBtnAuditor" onclick="switchTab('auditor')">🚀 Auditor</button>
+    <button class="nav-tab" id="tabBtnHistory" onclick="switchTab('history')">📊 History</button>
+    <button class="nav-tab" id="tabBtnDatabase" onclick="switchTab('database')">💾 Database</button>
+  </div>
 </header>
 
 <main>
-  <div class="card input-card">
-    <div class="input-row">
-      <input
-        id="urlInput"
-        class="control-input url-input"
-        type="url"
-        placeholder="https://example.com"
-        autocomplete="off"
-        spellcheck="false"
-      />
-      <select id="timeoutSelect" class="control-input timeout-select" title="Timeout per scan">
-        <option value="20">20s</option>
-        <option value="30" selected>30s</option>
-        <option value="45">45s</option>
-        <option value="60">60s</option>
-        <option value="90">90s</option>
-      </select>
-      <button id="auditBtn" class="btn-primary" onclick="startAudit()">Audit</button>
+
+  <!-- ================= TAB 1: AUDITOR ================= -->
+  <div id="tabAuditor" class="tab-view active">
+    <div class="card input-card">
+      <div class="input-row">
+        <div class="url-input-group">
+          <span class="url-prefix">https://</span>
+          <input id="urlInput" class="control-input url-input" type="text" placeholder="example.com" autocomplete="off" spellcheck="false" />
+        </div>
+        <select id="timeoutSelect" class="control-input timeout-select" title="Timeout per scan">
+          <option value="20">20s</option>
+          <option value="30" selected>30s</option>
+          <option value="45">45s</option>
+          <option value="60">60s</option>
+          <option value="90">90s</option>
+        </select>
+        <button id="auditBtn" class="btn-primary" onclick="startAudit()">Audit</button>
+      </div>
+
+      <div class="interaction-options">
+        <span class="interaction-title">// user interactions</span>
+        <label><input type="checkbox" id="clickConsent" checked /> Click cookie consent</label>
+        <label><input type="checkbox" id="scrollPage" checked /> Scroll page</label>
+        <label>Scroll count: <input type="number" id="scrollCount" value="3" min="1" max="10" style="width:50px; padding:2px 4px;" /></label>
+      </div>
+
+      <div id="progress">
+        <div class="spinner"></div>
+        <span id="statusMsg">Starting...</span>
+      </div>
+
+      <div id="errorMsg" style="display:none; color:var(--error); margin-top:12px; font-family:var(--font-mono);"></div>
     </div>
 
-    <div class="interaction-options">
-      <span class="interaction-title">// user interactions</span>
-      <label>
-        <input type="checkbox" id="clickConsent" checked />
-        Click cookie consent
-      </label>
-      <label>
-        <input type="checkbox" id="scrollPage" checked />
-        Scroll page
-      </label>
-      <label>
-        Scroll count:
-        <input type="number" id="scrollCount" value="3" min="1" max="10" />
-      </label>
-    </div>
+    <div id="results" style="display:none;">
+      <div class="summary">
+        <div class="stat"><span class="kpi-value" id="totalCount">0</span><span class="kpi-label">Total Scripts</span></div>
+        <div class="stat"><span class="kpi-value" id="externalCount">0</span><span class="kpi-label">External</span></div>
+        <div class="stat"><span class="kpi-value" id="inlineCount">0</span><span class="kpi-label">Inline</span></div>
+        <div class="stat"><span class="kpi-value" id="gtmInjectedCount">0</span><span class="kpi-label">Via GTM</span></div>
+        <div class="stat"><span class="kpi-value" id="blockedCount" style="color:var(--error)">0</span><span class="kpi-label">Blocked</span></div>
+        <div class="stat" id="gtmStat"><span class="kpi-label" style="margin-bottom:6px">GTM Status</span><span id="gtmBadge" class="tag">—</span></div>
+      </div>
 
-    <div id="progress">
-      <div class="spinner"></div>
-      <span id="statusMsg">Starting...</span>
-    </div>
+      <p class="kpi-label" style="margin-bottom:8px;">// vendors detected</p>
+      <div id="vendorChips" class="vendors"></div>
 
-    <div id="errorMsg" class="error-msg"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Vendor</th><th>Type</th><th>Via GTM</th><th>Blocked</th><th>Domain</th><th>URL</th></tr>
+          </thead>
+          <tbody id="scriptsBody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <div id="results">
+  <!-- ================= TAB 2: HISTORY ================= -->
+  <div id="tabHistory" class="tab-view">
+    <div class="page-hero">
+      <h1>Crawl History & Stats</h1>
+      <p class="subtitle">// session analytics, vendor breakdown & request logs</p>
+    </div>
+
     <div class="summary">
-      <div class="stat">
-        <span class="kpi-value" id="totalCount">0</span>
-        <span class="kpi-label">Total Scripts</span>
+      <div class="stat"><span class="kpi-value" id="histTotalSessions">0</span><span class="kpi-label">// TOTAL SESSIONS</span></div>
+      <div class="stat"><span class="kpi-value" id="histUniqueUrls">0</span><span class="kpi-label">// URLS CRAWLED</span></div>
+      <div class="stat"><span class="kpi-value" id="histTotalScripts">0</span><span class="kpi-label">// TRACKING REQUESTS</span></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <p class="kpi-label" style="margin:0">// RECENT SESSIONS</p>
+        <button class="btn-secondary" onclick="clearAllHistory()" style="color:var(--error);">Clear History</button>
       </div>
-      <div class="stat">
-        <span class="kpi-value" id="externalCount">0</span>
-        <span class="kpi-label">External</span>
-      </div>
-      <div class="stat">
-        <span class="kpi-value" id="inlineCount">0</span>
-        <span class="kpi-label">Inline</span>
-      </div>
-      <div class="stat">
-        <span class="kpi-value" id="gtmInjectedCount">0</span>
-        <span class="kpi-label">Via GTM</span>
-      </div>
-      <div class="stat">
-        <span class="kpi-value" id="blockedCount" style="color:var(--error)">0</span>
-        <span class="kpi-label">Blocked</span>
-      </div>
-      <div class="stat" id="gtmStat">
-        <span class="kpi-label" style="margin-bottom:6px">GTM Status</span>
-        <span id="gtmBadge" class="badge">—</span>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Timestamp</th><th>URL</th><th>Scripts</th><th>GTM</th><th>Blocked</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="histSessionsBody"></tbody>
+        </table>
       </div>
     </div>
 
-    <p class="section-title">// vendors detected</p>
-    <div id="vendorChips" class="vendors"></div>
-
-    <div class="table-header">
-      <p class="section-title" style="margin:0">// all scripts</p>
-      <div class="filter-tabs">
-        <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
-        <button class="filter-tab" onclick="setFilter('external', this)">External</button>
-        <button class="filter-tab" onclick="setFilter('inline', this)">Inline</button>
-        <button class="filter-tab" onclick="setFilter('gtm', this)">Via GTM</button>
-        <button class="filter-tab" onclick="setFilter('blocked', this)">Blocked</button>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <p class="kpi-label" style="margin:0">// TRACKING REQUEST LOG</p>
+        <input type="text" id="logSearch" class="control-input" placeholder="Search by URL, vendor, or script..." onkeyup="filterScriptsLog()" style="width:300px; padding:4px 10px; font-size:0.75rem;" />
+      </div>
+      <div class="table-wrap" style="max-height: 400px; overflow-y: auto;">
+        <table>
+          <thead>
+            <tr><th>Timestamp</th><th>URL</th><th>Name</th><th>Vendor</th><th>Type</th><th>Via GTM</th><th>Blocked</th></tr>
+          </thead>
+          <tbody id="histLogsBody"></tbody>
+        </table>
       </div>
     </div>
-
-    <div class="vendor-filter-bar">
-      <span class="vendor-filter-label">// filter by vendor</span>
-      <select id="vendorFilter" class="vendor-filter-select" onchange="applyFilters()">
-        <option value="all">All vendors</option>
-      </select>
-      <button class="clear-vendor-filter" id="clearVendorFilter" onclick="clearVendorFilter()">Clear</button>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Vendor</th>
-            <th>Type</th>
-            <th>Via GTM</th>
-            <th>Blocked</th>
-            <th>Domain</th>
-            <th>URL</th>
-          </tr>
-        </thead>
-        <tbody id="scriptsBody"></tbody>
-      </table>
-    </div>
-
-    <p class="scanned-at" id="scannedAt"></p>
   </div>
+
+  <!-- ================= TAB 3: DATABASE ================= -->
+  <div id="tabDatabase" class="tab-view">
+    <div class="page-hero">
+      <h1>Database Viewer</h1>
+      <p class="subtitle">// browse raw turso database tables & record schemas</p>
+    </div>
+
+    <div class="db-layout">
+      <div class="db-sidebar">
+        <p class="kpi-label" style="margin-bottom:12px;">// DATABASE TABLES</p>
+        <div id="dbTablesList"></div>
+      </div>
+
+      <div class="db-main">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <p class="kpi-label" style="margin:0;" id="dbTableName">// TABLE · AUDITS</p>
+          <span id="dbTotalRowsBadge" class="kpi-label" style="background:var(--field); padding:2px 8px; border-radius:4px;">0 ROWS</span>
+        </div>
+
+        <div id="dbColumnsPills" class="column-badges"></div>
+
+        <div style="margin-bottom:12px;">
+          <input type="text" id="dbSearch" class="control-input" placeholder="Search across all columns..." onkeyup="onDbSearch()" style="width:100%;" />
+        </div>
+
+        <div class="table-wrap" style="max-height: 450px; overflow-y: auto;">
+          <table>
+            <thead id="dbHead"></thead>
+            <tbody id="dbBody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-bar">
+          <span id="dbShowingRange">// SHOWING 0 OF 0 ROWS</span>
+          <div>
+            <button class="btn-secondary" id="dbPrevBtn" onclick="changeDbPage(-1)">← Prev</button>
+            <span id="dbPageIndicator" style="margin:0 8px;">PAGE 1 / 1</span>
+            <button class="btn-secondary" id="dbNextBtn" onclick="changeDbPage(1)">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
+<!-- Modal Inspector -->
+<div id="jsonModal" class="modal-backdrop" onclick="closeModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <p class="kpi-label" style="margin:0;">// RECORD DETAILS INSPECTOR</p>
+      <button class="btn-secondary" onclick="closeModal()">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <pre id="jsonModalContent"></pre>
+    </div>
+  </div>
+</div>
+
 <script>
-  let currentFilter = 'all';
-  let currentVendor = 'all';
   let allScripts = [];
   let activeSource = null;
+  let historyStatsData = null;
+  let currentDbPage = 1;
+  let currentDbTable = 'audits';
+  let currentDbSearch = '';
 
-  const VENDOR_ICONS = {
-    'Google': 'https://www.google.com/favicon.ico',
-    'Google Ads': 'https://www.google.com/favicon.ico',
-    'Google Ads (DoubleClick)': 'https://www.google.com/favicon.ico',
-    'Google Tag Manager': 'https://www.google.com/favicon.ico',
-    'Google Analytics (UA)': 'https://www.google.com/favicon.ico',
-    'Google Analytics (Legacy)': 'https://www.google.com/favicon.ico',
-    'Google Analytics 4 (gtag)': 'https://www.google.com/favicon.ico',
-    'Google Optimize': 'https://www.google.com/favicon.ico',
-    'Google Hosted Libraries': 'https://www.google.com/favicon.ico',
-    'Facebook Pixel': 'https://www.facebook.com/favicon.ico',
-    'Facebook / Meta SDK': 'https://www.facebook.com/favicon.ico',
-    'Microsoft': 'https://www.microsoft.com/favicon.ico',
-    'Microsoft Clarity': 'https://www.microsoft.com/favicon.ico',
-    'Apple': 'https://www.apple.com/favicon.ico',
-    'Adobe': 'https://www.adobe.com/favicon.ico',
-    'Cloudflare': 'https://www.cloudflare.com/favicon.ico',
-    'Cloudflare CDNJS': 'https://www.cloudflare.com/favicon.ico',
-    'Amazon': 'https://www.amazon.com/favicon.ico',
-    'Shopify': 'https://www.shopify.com/favicon.ico',
-    'Stripe': 'https://www.stripe.com/favicon.ico',
-    'HubSpot': 'https://www.hubspot.com/favicon.ico',
-    'Salesforce': 'https://www.salesforce.com/favicon.ico',
-    'Zendesk': 'https://www.zendesk.com/favicon.ico',
-    'Intercom': 'https://www.intercom.com/favicon.ico',
-    'Drift': 'https://www.drift.com/favicon.ico',
-    'Hotjar': 'https://www.hotjar.com/favicon.ico',
-    'Segment': 'https://www.segment.com/favicon.ico',
-    'Mixpanel': 'https://www.mixpanel.com/favicon.ico',
-    'Amplitude': 'https://www.amplitude.com/favicon.ico',
-    'Heap': 'https://www.heap.io/favicon.ico',
-    'FullStory': 'https://www.fullstory.com/favicon.ico',
-    'Pendo': 'https://www.pendo.io/favicon.ico',
-    'PostHog': 'https://www.posthog.com/favicon.ico',
-    'Sentry': 'https://www.sentry.io/favicon.ico',
-    'Datadog': 'https://www.datadog.com/favicon.ico',
-    'New Relic': 'https://www.newrelic.com/favicon.ico',
-    'OneTrust': 'https://www.onetrust.com/favicon.ico',
-    'OneTrust (CMP)': 'https://www.onetrust.com/favicon.ico',
-    'Cookiebot': 'https://www.cookiebot.com/favicon.ico',
-    'Cookiebot (CMP)': 'https://www.cookiebot.com/favicon.ico',
-    'Didomi': 'https://www.didomi.io/favicon.ico',
-    'Didomi (CMP)': 'https://www.didomi.io/favicon.ico',
-    'CookieYes': 'https://www.cookieyes.com/favicon.ico',
-    'CookieYes (CMP)': 'https://www.cookieyes.com/favicon.ico',
-    'Bing Ads': 'https://www.bing.com/favicon.ico',
-    'Bing Ads (UET)': 'https://www.bing.com/favicon.ico',
-    'Crisp': 'https://www.crisp.chat/favicon.ico',
-    'LinkedIn': 'https://www.linkedin.com/favicon.ico',
-    'LinkedIn Insight Tag': 'https://www.linkedin.com/favicon.ico',
-    'Twitter/X Ads Pixel': 'https://www.twitter.com/favicon.ico',
-    'Twitter/X Platform': 'https://www.twitter.com/favicon.ico',
-    'Pinterest Tag': 'https://www.pinterest.com/favicon.ico',
-    'TikTok Pixel': 'https://www.tiktok.com/favicon.ico',
-    'Criteo': 'https://www.criteo.com/favicon.ico',
-    'Outbrain': 'https://www.outbrain.com/favicon.ico',
-    'Quantcast': 'https://www.quantcast.com/favicon.ico',
-    'Taboola': 'https://www.taboola.com/favicon.ico',
-    'Yandex': 'https://www.yandex.com/favicon.ico',
-    'Baidu': 'https://www.baidu.com/favicon.ico',
-    'Alibaba': 'https://www.alibaba.com/favicon.ico',
-    'Fastly': 'https://www.fastly.com/favicon.ico',
-    'Akamai': 'https://www.akamai.com/favicon.ico',
-    'Vercel': 'https://www.vercel.com/favicon.ico',
-    'jQuery (CDN)': 'https://www.jquery.com/favicon.ico',
-    'unpkg CDN': 'https://www.unpkg.com/favicon.ico',
-    'jsDelivr CDN': 'https://www.jsdelivr.com/favicon.ico',
-  };
+  function switchTab(tabName) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
 
-  function getVendorIcon(vendor) {
-    return VENDOR_ICONS[vendor] || null;
-  }
-
-  function extractDomain(url) {
-    if (url === 'inline') return 'inline';
-    try {
-      const u = new URL(url);
-      return u.hostname;
-    } catch {
-      return url;
+    if (tabName === 'auditor') {
+      document.getElementById('tabBtnAuditor').classList.add('active');
+      document.getElementById('tabAuditor').classList.add('active');
+    } else if (tabName === 'history') {
+      document.getElementById('tabBtnHistory').classList.add('active');
+      document.getElementById('tabHistory').classList.add('active');
+      loadHistoryPage();
+    } else if (tabName === 'database') {
+      document.getElementById('tabBtnDatabase').classList.add('active');
+      document.getElementById('tabDatabase').classList.add('active');
+      loadDatabasePage();
     }
   }
 
+  /* Auditor logic */
   function startAudit() {
-    const url = document.getElementById('urlInput').value.trim();
-    if (!url) { showError('Please enter a URL.'); return; }
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      showError('URL must start with http:// or https://');
-      return;
-    }
+    let raw = document.getElementById('urlInput').value.trim();
+    raw = raw.replace(/^https?:\/\//i, '');
+    if (!raw) { showError('Please enter a domain or path (e.g. example.com).'); return; }
 
-    localStorage.setItem('scriptAuditor_lastUrl', url);
+    const url = 'https://' + raw;
 
     const timeout = parseInt(document.getElementById('timeoutSelect').value, 10);
     const clickConsent = document.getElementById('clickConsent').checked;
@@ -837,32 +675,26 @@
     const scrollCount = parseInt(document.getElementById('scrollCount').value, 10) || 3;
 
     hideError();
-    hideResults();
-    showProgress('Starting audit...');
-    setAuditBtn(false);
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('progress').style.display = 'flex';
+    document.getElementById('auditBtn').disabled = true;
 
     if (activeSource) { activeSource.close(); activeSource = null; }
 
     fetch('/audit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url,
-        timeout,
-        click_consent: clickConsent,
-        scroll,
-        scroll_count: scrollCount,
-      }),
+      body: JSON.stringify({ url, timeout, click_consent: clickConsent, scroll, scroll_count: scrollCount }),
     })
     .then(r => r.json())
     .then(({ job_id, error }) => {
-      if (error) { showError(error); hideProgress(); setAuditBtn(true); return; }
+      if (error) { showError(error); document.getElementById('progress').style.display = 'none'; document.getElementById('auditBtn').disabled = false; return; }
       listenToJob(job_id);
     })
     .catch(err => {
       showError('Failed to start audit: ' + err.message);
-      hideProgress();
-      setAuditBtn(true);
+      document.getElementById('progress').style.display = 'none';
+      document.getElementById('auditBtn').disabled = false;
     });
   }
 
@@ -872,43 +704,25 @@
 
     source.onmessage = (e) => {
       const event = JSON.parse(e.data);
-
       if (event.type === 'status') {
-        setStatus(event.message);
+        document.getElementById('statusMsg').textContent = event.message;
       } else if (event.type === 'result') {
-        source.close();
-        activeSource = null;
-        hideProgress();
-        setAuditBtn(true);
+        source.close(); activeSource = null;
+        document.getElementById('progress').style.display = 'none';
+        document.getElementById('auditBtn').disabled = false;
         renderResults(event.data);
       } else if (event.type === 'error') {
-        source.close();
-        activeSource = null;
-        hideProgress();
-        setAuditBtn(true);
+        source.close(); activeSource = null;
+        document.getElementById('progress').style.display = 'none';
+        document.getElementById('auditBtn').disabled = false;
         showError(event.message || 'Unknown error');
-      } else if (event.type === 'done') {
-        source.close();
-        activeSource = null;
       }
-    };
-
-    source.onerror = () => {
-      source.close();
-      activeSource = null;
-      hideProgress();
-      setAuditBtn(true);
-      showError('Connection lost. Please try again.');
     };
   }
 
   function renderResults(data) {
     allScripts = data.scripts || [];
-    currentFilter = 'all';
-
-    document.querySelectorAll('.filter-tab').forEach((t, i) => {
-      t.classList.toggle('active', i === 0);
-    });
+    document.getElementById('results').style.display = 'block';
 
     const external = allScripts.filter(s => s.type === 'external');
     const inline   = allScripts.filter(s => s.type === 'inline');
@@ -922,161 +736,213 @@
     document.getElementById('blockedCount').textContent     = blocked.length;
 
     const badge = document.getElementById('gtmBadge');
-    if (data.gtm_detected) {
-      badge.textContent = 'GTM Detected';
-      badge.className = 'badge badge-gtm';
-    } else {
-      badge.textContent = 'No GTM';
-      badge.className = 'badge badge-no-gtm';
-    }
+    badge.textContent = data.gtm_detected ? 'GTM Detected' : 'No GTM';
+    badge.className = data.gtm_detected ? 'tag tag-gtm' : 'tag tag-no';
 
-    const vendorCounts = {};
-    allScripts.forEach(s => {
-      vendorCounts[s.vendor] = (vendorCounts[s.vendor] || 0) + 1;
-    });
-    const sorted = Object.entries(vendorCounts).sort((a, b) => b[1] - a[1]);
-    const chipsEl = document.getElementById('vendorChips');
-    chipsEl.innerHTML = sorted.map(([vendor, count]) => {
-      const icon = getVendorIcon(vendor);
-      const iconHtml = icon ? `<img class="vc-icon" src="${icon}" alt="" onerror="this.style.display='none'" />` : '';
-      return `<div class="vendor-chip" onclick="filterByVendor('${esc(vendor)}', this)">
-        ${iconHtml}
-        <span class="vc-name">${esc(vendor)}</span>
-        <span class="vc-count">${count}</span>
-      </div>`;
-    }).join('');
-
-    const vendorSelect = document.getElementById('vendorFilter');
-    vendorSelect.innerHTML = '<option value="all">All vendors</option>' +
-      sorted.map(([vendor]) => `<option value="${esc(vendor)}">${esc(vendor)}</option>`).join('');
-
-    renderTable(allScripts);
-
-    document.getElementById('scannedAt').textContent = '// scanned at ' + (data.scanned_at || '');
-    document.getElementById('results').style.display = 'block';
+    const tbody = document.getElementById('scriptsBody');
+    tbody.innerHTML = allScripts.map(s => `<tr>
+      <td title="${esc(s.name)}">${esc(formatScriptName(s.name))}</td>
+      <td>${esc(s.vendor)}</td>
+      <td><span class="tag tag-${s.type}">${s.type}</span></td>
+      <td>${s.via_gtm ? '<span class="tag tag-gtm">YES</span>' : '<span class="tag tag-no">NO</span>'}</td>
+      <td>${s.blocked ? '<span class="tag tag-blocked">BLOCKED</span>' : '<span class="tag tag-no">OK</span>'}</td>
+      <td>${esc(extractDomain(s.url))}</td>
+      <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><a href="${esc(s.url)}" target="_blank" style="color:var(--text-muted);">${esc(s.url)}</a></td>
+    </tr>`).join('');
   }
 
-  function renderTable(scripts) {
-    const tbody = document.getElementById('scriptsBody');
-    if (!scripts.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted);padding:20px;text-align:center">No scripts found</td></tr>';
+  /* History Page */
+  function loadHistoryPage() {
+    fetch('/api/history/stats')
+      .then(r => r.json())
+      .then(data => {
+        historyStatsData = data;
+        document.getElementById('histTotalSessions').textContent = data.total_sessions || 0;
+        document.getElementById('histUniqueUrls').textContent = data.unique_urls || 0;
+        document.getElementById('histTotalScripts').textContent = data.total_scripts || 0;
+
+        renderHistorySessions();
+        renderScriptsLog(data.scripts_log || []);
+      });
+  }
+
+  function renderHistorySessions() {
+    fetch('/api/history')
+      .then(r => r.json())
+      .then(data => {
+        const items = data.history || [];
+        const tbody = document.getElementById('histSessionsBody');
+        if (!items.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:16px;">No history records found.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = items.map(item => `<tr>
+          <td><a href="javascript:void(0)" onclick="loadAuditToAuditor(${item.id})" style="font-weight:700;">#${item.id}</a></td>
+          <td>${esc((item.scanned_at || '').replace('T', ' ').replace('Z', ''))}</td>
+          <td style="font-weight:600;"><a href="javascript:void(0)" onclick="loadAuditToAuditor(${item.id})">${esc(item.url)}</a></td>
+          <td>${item.total_scripts}</td>
+          <td>${item.gtm_detected ? '<span class="tag tag-gtm">YES</span>' : '<span class="tag tag-no">NO</span>'}</td>
+          <td>${item.blocked_count > 0 ? `<span class="tag tag-blocked">${item.blocked_count}</span>` : '<span class="tag tag-no">0</span>'}</td>
+          <td>
+            <button class="btn-primary" onclick="loadAuditToAuditor(${item.id})" style="padding:4px 10px; font-size:11px;">Open in Auditor</button>
+            <button class="btn-secondary" onclick="deleteHistory(${item.id})" style="color:var(--error); margin-left:4px;">✕</button>
+          </td>
+        </tr>`).join('');
+      });
+  }
+
+  function renderScriptsLog(logs) {
+    const tbody = document.getElementById('histLogsBody');
+    if (!logs || !logs.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:16px;">No script logs available.</td></tr>';
       return;
     }
-    tbody.innerHTML = scripts.map(s => {
-      const rowClass = [
-        s.via_gtm   ? 'via-gtm'    : '',
-        s.blocked   ? 'is-blocked' : '',
-      ].filter(Boolean).join(' ');
-
-      const typeTag = s.type === 'external'
-        ? '<span class="tag tag-external">external</span>'
-        : '<span class="tag tag-inline">inline</span>';
-
-      const gtmTag = s.via_gtm
-        ? '<span class="tag tag-gtm">GTM</span>'
-        : '<span class="tag-no">—</span>';
-
-      const blockedTag = s.blocked
-        ? `<span class="tag tag-blocked" title="${esc(s.block_reason || '')}">blocked</span>`
-        : '<span class="tag-no">—</span>';
-
-      const nameCell = s.blocked && s.block_reason
-        ? `${esc(s.name)}<span class="block-reason">${esc(s.block_reason)}</span>`
-        : esc(s.name);
-
-      const icon = getVendorIcon(s.vendor);
-      const vendorCell = icon
-        ? `<img class="vc-icon" src="${icon}" alt="" onerror="this.style.display='none'" style="width:14px;height:14px;border-radius:2px;vertical-align:middle;margin-right:6px" />${esc(s.vendor)}`
-        : esc(s.vendor);
-
-      const domain = extractDomain(s.url);
-      const domainCell = domain === 'inline'
-        ? '<span style="color:var(--text-muted)">inline</span>'
-        : `<span style="color:var(--text-main)">${esc(domain)}</span>`;
-
-      const urlCell = s.url === 'inline'
-        ? '<span style="color:var(--text-muted)">inline</span>'
-        : `<a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.url)}">${esc(s.url)}</a>`;
-
-      return `<tr class="${rowClass}">
-        <td>${nameCell}</td>
-        <td>${vendorCell}</td>
-        <td>${typeTag}</td>
-        <td>${gtmTag}</td>
-        <td>${blockedTag}</td>
-        <td>${domainCell}</td>
-        <td class="url-cell">${urlCell}</td>
-      </tr>`;
-    }).join('');
+    tbody.innerHTML = logs.map(l => `<tr>
+      <td>${esc((l.scanned_at || '').replace('T', ' ').replace('Z', ''))}</td>
+      <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><a href="javascript:void(0)" onclick="loadAuditToAuditor(${l.audit_id})" style="font-weight:600; color:var(--text-main);">${esc(l.audit_url)}</a></td>
+      <td title="${esc(l.name)}">${esc(formatScriptName(l.name))}</td>
+      <td><strong>${esc(l.vendor)}</strong></td>
+      <td><span class="tag tag-${l.type}">${l.type}</span></td>
+      <td>${l.via_gtm ? '<span class="tag tag-gtm">YES</span>' : '<span class="tag tag-no">NO</span>'}</td>
+      <td>${l.blocked ? '<span class="tag tag-blocked">BLOCKED</span>' : '<span class="tag tag-no">OK</span>'}</td>
+    </tr>`).join('');
   }
 
-  function filterByVendor(vendor, chipEl) {
-    currentVendor = vendor;
-    document.getElementById('vendorFilter').value = vendor;
-    document.getElementById('clearVendorFilter').classList.add('visible');
-
-    document.querySelectorAll('.vendor-chip').forEach(c => c.classList.remove('active'));
-    if (chipEl) chipEl.classList.add('active');
-
-    applyFilters();
+  function filterScriptsLog() {
+    const q = document.getElementById('logSearch').value.toLowerCase().trim();
+    if (!historyStatsData || !historyStatsData.scripts_log) return;
+    if (!q) { renderScriptsLog(historyStatsData.scripts_log); return; }
+    const filtered = historyStatsData.scripts_log.filter(l =>
+      (l.audit_url && l.audit_url.toLowerCase().includes(q)) ||
+      (l.vendor && l.vendor.toLowerCase().includes(q)) ||
+      (l.name && l.name.toLowerCase().includes(q))
+    );
+    renderScriptsLog(filtered);
   }
 
-  function clearVendorFilter() {
-    currentVendor = 'all';
-    document.getElementById('vendorFilter').value = 'all';
-    document.getElementById('clearVendorFilter').classList.remove('visible');
-    document.querySelectorAll('.vendor-chip').forEach(c => c.classList.remove('active'));
-    applyFilters();
-  }
-
-  function applyFilters() {
-    const selectVal = document.getElementById('vendorFilter').value;
-    if (selectVal !== 'all') {
-      currentVendor = selectVal;
-      document.getElementById('clearVendorFilter').classList.add('visible');
-      document.querySelectorAll('.vendor-chip').forEach(c => {
-        c.classList.toggle('active', c.querySelector('.vc-name')?.textContent === currentVendor);
+  function loadAuditToAuditor(auditId) {
+    fetch(`/api/history/${auditId}`)
+      .then(r => r.json())
+      .then(data => {
+        switchTab('auditor');
+        let domain = (data.url || '').replace(/^https?:\/\//i, '');
+        document.getElementById('urlInput').value = domain;
+        renderResults(data);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       });
-    } else if (currentVendor !== 'all') {
-      currentVendor = 'all';
-      document.getElementById('clearVendorFilter').classList.remove('visible');
-      document.querySelectorAll('.vendor-chip').forEach(c => c.classList.remove('active'));
-    }
-
-    let filtered = allScripts;
-
-    if (currentVendor !== 'all') {
-      filtered = filtered.filter(s => s.vendor === currentVendor);
-    }
-
-    if (currentFilter === 'gtm') {
-      filtered = filtered.filter(s => s.via_gtm);
-    } else if (currentFilter === 'blocked') {
-      filtered = filtered.filter(s => s.blocked);
-    } else if (currentFilter !== 'all') {
-      filtered = filtered.filter(s => s.type === currentFilter);
-    }
-
-    renderTable(filtered);
   }
 
-  function setFilter(filter, btn) {
-    currentFilter = filter;
-    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    applyFilters();
+  function deleteHistory(auditId) {
+    fetch(`/api/history/${auditId}`, { method: 'DELETE' })
+      .then(r => r.json())
+      .then(() => loadHistoryPage());
   }
 
-  function showProgress(msg) {
-    setStatus(msg);
-    document.getElementById('progress').style.display = 'flex';
+  function clearAllHistory() {
+    if (!confirm('Clear all history records?')) return;
+    fetch('/api/history/clear', { method: 'DELETE' })
+      .then(r => r.json())
+      .then(() => loadHistoryPage());
   }
-  function hideProgress() {
-    document.getElementById('progress').style.display = 'none';
+
+  /* Database Viewer Page */
+  function loadDatabasePage() {
+    fetch('/api/db/tables')
+      .then(r => r.json())
+      .then(data => {
+        const tables = data.tables || [];
+        const container = document.getElementById('dbTablesList');
+        container.innerHTML = tables.map(t => `<div class="table-list-item ${t.name === currentDbTable ? 'active' : ''}" onclick="selectDbTable('${t.name}')">
+          <span>${t.name}</span>
+          <span class="table-badge">${t.row_count}</span>
+        </div>`).join('');
+        loadTableData();
+      });
   }
-  function setStatus(msg) {
-    document.getElementById('statusMsg').textContent = msg;
+
+  function selectDbTable(tableName) {
+    currentDbTable = tableName;
+    currentDbPage = 1;
+    loadDatabasePage();
   }
+
+  function loadTableData() {
+    const q = encodeURIComponent(currentDbSearch);
+    fetch(`/api/db/table/${currentDbTable}?page=${currentDbPage}&limit=15&q=${q}`)
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('dbTableName').textContent = `// TABLE · ${data.table.toUpperCase()}`;
+        document.getElementById('dbTotalRowsBadge').textContent = `${data.total_rows} ROWS`;
+
+        const colsPills = document.getElementById('dbColumnsPills');
+        colsPills.innerHTML = '// COLUMNS: ' + (data.columns || []).map(c => `<span class="col-badge">${c}</span>`).join(' ');
+
+        const head = document.getElementById('dbHead');
+        const displayCols = (data.columns || []).filter(c => c !== 'details_json');
+        head.innerHTML = '<tr>' + displayCols.map(c => `<th>${c}</th>`).join('') + '<th>DETAILS</th></tr>';
+
+        const tbody = document.getElementById('dbBody');
+        if (!data.rows || !data.rows.length) {
+          tbody.innerHTML = `<tr><td colspan="${displayCols.length + 1}" style="text-align:center; padding:16px;">No rows found.</td></tr>`;
+        } else {
+          tbody.innerHTML = data.rows.map(row => {
+            const cells = displayCols.map(col => {
+              let val = row[col];
+              let content = '';
+              if (col === 'id') {
+                content = `<a href="javascript:void(0)" onclick="openJsonModal(${row.id})" style="font-weight:700;">#${val}</a>`;
+              } else if (val === null || val === undefined) {
+                content = '<span style="opacity:0.4;">NULL</span>';
+              } else {
+                let valStr = String(val);
+                if (valStr.startsWith('data:')) {
+                  valStr = valStr.substring(0, 35) + '...';
+                } else if (valStr.length > 80) {
+                  valStr = valStr.substring(0, 77) + '...';
+                }
+                content = esc(valStr);
+              }
+              return `<td>${content}</td>`;
+            }).join('');
+            return `<tr>${cells}<td><button class="btn-secondary" onclick="openJsonModal(${row.id})">Inspect</button></td></tr>`;
+          }).join('');
+        }
+
+        document.getElementById('dbShowingRange').textContent = `// SHOWING ${data.rows.length ? (data.page-1)*data.limit + 1 : 0} - ${Math.min(data.page*data.limit, data.total_rows)} OF ${data.total_rows} ROWS`;
+        document.getElementById('dbPageIndicator').textContent = `PAGE ${data.page} / ${data.total_pages}`;
+        document.getElementById('dbPrevBtn').disabled = (data.page <= 1);
+        document.getElementById('dbNextBtn').disabled = (data.page >= data.total_pages);
+      });
+  }
+
+  function onDbSearch() {
+    currentDbSearch = document.getElementById('dbSearch').value;
+    currentDbPage = 1;
+    loadTableData();
+  }
+
+  function changeDbPage(delta) {
+    currentDbPage += delta;
+    loadTableData();
+  }
+
+  function openJsonModal(auditId) {
+    fetch(`/api/history/${auditId}`)
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('jsonModalContent').textContent = JSON.stringify(data, null, 2);
+        document.getElementById('jsonModal').style.display = 'flex';
+      });
+  }
+
+  function closeModal() {
+    document.getElementById('jsonModal').style.display = 'none';
+  }
+
+  function inspectHistoryItem(auditId) {
+    openJsonModal(auditId);
+  }
+
   function showError(msg) {
     const el = document.getElementById('errorMsg');
     el.textContent = msg;
@@ -1085,29 +951,35 @@
   function hideError() {
     document.getElementById('errorMsg').style.display = 'none';
   }
-  function hideResults() {
-    document.getElementById('results').style.display = 'none';
+  function extractDomain(url) {
+    if (!url || url === 'inline') return 'inline';
+    try { return new URL(url).hostname || url; } catch { return url; }
   }
-  function setAuditBtn(enabled) {
-    document.getElementById('auditBtn').disabled = !enabled;
+  function formatScriptName(name) {
+    if (!name || name === 'inline') return name || 'inline';
+    if (name.startsWith('data:') || name.startsWith('javascript;') || name.startsWith('javascript:')) {
+      return 'inline-base64-script';
+    }
+    if (name.length > 50) {
+      return name.substring(0, 47) + '...';
+    }
+    return name;
   }
   function esc(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  document.getElementById('urlInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') startAudit();
+  const urlInputEl = document.getElementById('urlInput');
+  urlInputEl.addEventListener('input', (e) => {
+    let val = e.target.value;
+    if (val.startsWith('https://')) {
+      e.target.value = val.slice(8);
+    } else if (val.startsWith('http://')) {
+      e.target.value = val.slice(7);
+    }
   });
 
-  // Restore last URL from localStorage
-  const savedUrl = localStorage.getItem('scriptAuditor_lastUrl');
-  if (savedUrl) {
-    document.getElementById('urlInput').value = savedUrl;
-  }
+  urlInputEl.addEventListener('keydown', e => { if (e.key === 'Enter') startAudit(); });
 </script>
 </body>
 </html>

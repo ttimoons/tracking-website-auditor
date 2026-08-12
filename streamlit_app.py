@@ -19,6 +19,9 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from audit_scripts import audit_url
 from vendor_map import lookup_vendor
+import db
+
+db.init_db()
 
 st.set_page_config(
     page_title="Script Auditor V2",
@@ -455,6 +458,52 @@ with st.container():
     with col_c:
         scroll_count = st.number_input("Scroll count", min_value=1, max_value=10, value=3)
 
+# ── Audit History Expander ──
+with st.expander("📜 Audit History (Turso DB)", expanded=False):
+    history_records = db.get_history(limit=50)
+    if not history_records:
+        st.info("No audit history found in database.")
+    else:
+        df_hist = pd.DataFrame(history_records)
+        if "scanned_at" in df_hist.columns:
+            df_hist["scanned_at"] = df_hist["scanned_at"].str.replace("T", " ").str.replace("Z", "")
+        st.dataframe(
+            df_hist[["id", "url", "scanned_at", "total_scripts", "gtm_detected", "blocked_count"]],
+            column_config={
+                "id": st.column_config.NumberColumn("ID", width="small"),
+                "url": st.column_config.TextColumn("URL"),
+                "scanned_at": st.column_config.TextColumn("Scanned At"),
+                "total_scripts": st.column_config.NumberColumn("Scripts"),
+                "gtm_detected": st.column_config.CheckboxColumn("GTM"),
+                "blocked_count": st.column_config.NumberColumn("Blocked"),
+            },
+            hide_index=True,
+            use_container_width=True,
+        )
+
+        col_h1, col_h2, col_h3 = st.columns([3, 1, 1])
+        with col_h1:
+            audit_options = {f"#{h['id']} - {h['url']} ({str(h['scanned_at'])[:16]})": h['id'] for h in history_records}
+            selected_audit_label = st.selectbox(
+                "Select past audit to inspect",
+                options=list(audit_options.keys()),
+                label_visibility="collapsed"
+            )
+        with col_h2:
+            if st.button("Load Audit"):
+                selected_id = audit_options[selected_audit_label]
+                loaded_result = db.get_audit_by_id(selected_id)
+                if loaded_result:
+                    st.session_state.last_url = loaded_result.get("url", "")
+                    st.session_state.scripts_data = loaded_result.get("scripts", [])
+                    st.session_state.scanned_at = loaded_result.get("scanned_at", "")
+                    st.session_state.gtm_detected = loaded_result.get("gtm_detected", False)
+                    st.rerun()
+        with col_h3:
+            if st.button("Clear History"):
+                db.clear_history()
+                st.rerun()
+
 # ── Run audit ──
 if audit_clicked:
     if not url_input or not url_input.startswith(("http://", "https://")):
@@ -471,6 +520,7 @@ if audit_clicked:
                     st.error(result["error"])
                     st.session_state.scripts_data = []
                 else:
+                    db.save_audit(result)
                     st.session_state.scripts_data = result.get("scripts", [])
                     st.session_state.scanned_at = result.get("scanned_at", "")
                     st.session_state.gtm_detected = result.get("gtm_detected", False)

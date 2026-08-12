@@ -94,17 +94,22 @@ def infer_name(url: str) -> str:
     """Extract a human-readable script name from a URL."""
     if url == "inline":
         return "inline"
+    if url.startswith("data:") or url.startswith("javascript;") or url.startswith("javascript:"):
+        return "inline-base64-script"
     try:
         path = urlparse(url).path.rstrip("/")
         filename = path.split("/")[-1] if "/" in path else path
-        # Strip query params that crept into the filename
         filename = filename.split("?")[0]
         if filename:
+            if len(filename) > 50:
+                return filename[:47] + "..."
             return filename
-        # Fallback: use hostname
-        return urlparse(url).hostname or url
+        hostname = urlparse(url).hostname
+        if hostname:
+            return hostname
+        return url[:50]
     except Exception:
-        return url
+        return url[:50]
 
 
 def is_gtm_request(url: str) -> bool:
@@ -537,6 +542,11 @@ def parse_args() -> argparse.Namespace:
         metavar="N",
         help="Number of scroll steps (default: 3)",
     )
+    parser.add_argument(
+        "--no-db",
+        action="store_true",
+        help="Disable saving audit results to Turso DB",
+    )
     return parser.parse_args()
 
 
@@ -599,6 +609,14 @@ def run_audit(urls: list, args: argparse.Namespace) -> None:
                 result = audit_url(url, browser, timeout_ms, interactions)
                 results.append(result)
                 print_result(result, args.verbose, index=i, total=total)
+
+                if not args.no_db and not result.get("error"):
+                    try:
+                        import db
+                        db.save_audit(result)
+                    except Exception as e:
+                        if args.verbose:
+                            print(f"  Note: DB save skipped ({e})")
         except KeyboardInterrupt:
             print("\nInterrupted. Saving partial results...")
         finally:
