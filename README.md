@@ -136,13 +136,13 @@ python3 audit_scripts.py --scroll-count N       Number of scroll steps (default:
 |---|---|
 | Analytics | Google Analytics (UA + GA4), Mixpanel, Amplitude, Heap, Segment |
 | Tag Management | Google Tag Manager |
-| Marketing | Facebook Pixel, LinkedIn Insight, Twitter/X, TikTok, Pinterest, Google Ads, Criteo, Outbrain, Taboola |
+| Marketing | Facebook Pixel, LinkedIn Insight, Twitter/X, TikTok, Pinterest, Google Ads, Bing Ads (UET), Criteo, Outbrain, Taboola |
 | Heatmaps/Session | Hotjar, Microsoft Clarity, Crazy Egg, Lucky Orange, FullStory, Mouseflow, Glassbox |
 | CRM / Support | HubSpot, Intercom, Drift, Zendesk, Crisp |
 | Product Analytics | Pendo, Qualaroo |
 | Error/Monitoring | Sentry, Datadog, New Relic |
 | Payments | Stripe |
-| Consent (CMP) | OneTrust, Cookiebot, Didomi |
+| Consent (CMP) | OneTrust, Cookiebot, Didomi, CookieYes |
 | CDN Libraries | jQuery, Google Hosted, Cloudflare CDNJS, jsDelivr, unpkg |
 | Other | Yandex, Baidu, Alibaba, Shopify, Vercel, Fastly, Akamai, Quantcast |
 

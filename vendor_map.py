@@ -42,6 +42,9 @@ VENDOR_PATTERNS = [
     ("static.ads-twitter.com", "Twitter/X Ads Pixel"),
     ("platform.twitter.com", "Twitter/X Platform"),
     ("clarity.ms", "Microsoft Clarity"),
+    ("bat.bing.com", "Bing Ads (UET)"),
+    ("bing.com/bat", "Bing Ads (UET)"),
+    ("bing.com", "Bing Ads (UET)"),
     ("cdn.heapanalytics.com", "Heap"),
     ("heapanalytics.com", "Heap"),
     ("cdn.mxpnl.com", "Mixpanel"),
@@ -83,6 +86,9 @@ VENDOR_PATTERNS = [
     ("cookie-cdn.cookiepro.com", "OneTrust (CMP)"),
     ("consent.cookiebot.com", "Cookiebot (CMP)"),
     ("sdk.privacy-center.org", "Didomi (CMP)"),
+    ("cookieyes.com", "CookieYes (CMP)"),
+    ("cdn-cookieyes.com", "CookieYes (CMP)"),
+    ("cookieyes", "CookieYes (CMP)"),
     ("code.jquery.com", "jQuery (CDN)"),
     ("ajax.googleapis.com/ajax/libs", "Google Hosted Libraries"),
     ("cdnjs.cloudflare.com", "Cloudflare CDNJS"),
@@ -107,6 +113,16 @@ _INLINE_FINGERPRINTS = [
     ("drift.load(", "Drift"),
     ("FS.identify", "FullStory"),
     ("clarity(", "Microsoft Clarity"),
+    ("uetq", "Bing Ads (UET)"),
+    ("window.uetq", "Bing Ads (UET)"),
+    ("bat.bing.com", "Bing Ads (UET)"),
+    ("bing.com/bat", "Bing Ads (UET)"),
+    ("UET(", "Bing Ads (UET)"),
+    ("cookieyes", "CookieYes (CMP)"),
+    ("ckyes", "CookieYes (CMP)"),
+    ("_cookieyes", "CookieYes (CMP)"),
+    ("cdn-cookieyes", "CookieYes (CMP)"),
+    ("cookieyes-consent", "CookieYes (CMP)"),
     ("lintrk(", "LinkedIn Insight Tag"),
     ("twq(", "Twitter/X Ads Pixel"),
     ("posthog.init(", "PostHog"),
@@ -155,6 +171,11 @@ def lookup_vendor(url: str) -> str:
     ):
         return "Google Tag Manager"
 
+    # Explicit patterns take precedence
+    for pattern, vendor in VENDOR_PATTERNS:
+        if pattern.lower() in lowered:
+            return vendor
+
     db = _load_vendor_db()
     domain = _extract_domain(url)
     if domain and domain in db:
@@ -165,10 +186,6 @@ def lookup_vendor(url: str) -> str:
         parent_domain = ".".join(host_parts[-2:])
         if parent_domain in db:
             return db[parent_domain]
-
-    for pattern, vendor in VENDOR_PATTERNS:
-        if pattern.lower() in lowered:
-            return vendor
 
     return "Unknown"
 
