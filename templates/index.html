@@ -322,6 +322,15 @@
       color: var(--text-muted);
     }
 
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
     /* Vendor Pills & Badges */
     .vendors { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
     .vendor-chip {
@@ -335,6 +344,83 @@
     .vendor-chip.active { border-color: var(--primary); background: rgba(12, 68, 124, 0.1); }
     .vc-icon { width: 14px; height: 14px; border-radius: 2px; }
     .vc-count { opacity: 0.65; }
+
+    /* Category Filter Tabs & Bar */
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+    }
+
+    .filter-tab {
+      background: transparent;
+      border: 1px solid var(--border-faint);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-tab.active, .filter-tab:hover {
+      background: var(--field);
+      color: var(--text-main);
+      border-color: var(--primary);
+    }
+
+    .vendor-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .vendor-filter-label {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .vendor-filter-select {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: var(--text-main);
+    }
+
+    .clear-vendor-filter {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--error);
+      cursor: pointer;
+    }
+    .clear-vendor-filter.visible { display: inline-block; }
+
+    .scanned-at {
+      margin-top: 16px;
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: var(--text-muted);
+      text-align: right;
+    }
 
     /* Table Styles */
     .table-wrap {
@@ -354,6 +440,11 @@
     }
     tbody tr { border-bottom: 1px solid var(--border-faint); transition: background 0.1s; }
     tbody tr:hover { background: rgba(44, 44, 42, 0.025); }
+    tbody tr.via-gtm { background: rgba(12, 68, 124, 0.04); }
+    tbody tr.via-gtm:hover { background: rgba(12, 68, 124, 0.08); }
+    tbody tr.is-blocked { background: rgba(216, 90, 48, 0.04); }
+    tbody tr.is-blocked:hover { background: rgba(216, 90, 48, 0.08); }
+
     td { padding: 10px 14px; font-family: var(--font-mono); font-size: var(--font-size-xs); vertical-align: middle; }
 
     .tag {
@@ -366,6 +457,15 @@
     .tag-gtm      { background: rgba(12, 68, 124, 0.12); color: var(--primary); }
     .tag-blocked  { background: rgba(216, 90, 48, 0.12); color: var(--error); border: 1px solid rgba(216, 90, 48, 0.25); }
     .tag-no       { color: var(--text-muted); }
+
+    .block-reason {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--error);
+      opacity: 0.85;
+      margin-top: 2px;
+    }
 
     /* Database Viewer Layout */
     .db-layout {
@@ -518,8 +618,27 @@
         <div class="stat" id="gtmStat"><span class="kpi-label" style="margin-bottom:6px">GTM Status</span><span id="gtmBadge" class="tag">—</span></div>
       </div>
 
-      <p class="kpi-label" style="margin-bottom:8px;">// vendors detected</p>
+      <p class="section-title">// vendors detected</p>
       <div id="vendorChips" class="vendors"></div>
+
+      <div class="table-header">
+        <p class="section-title" style="margin:0">// all scripts</p>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
+          <button class="filter-tab" onclick="setFilter('external', this)">External</button>
+          <button class="filter-tab" onclick="setFilter('inline', this)">Inline</button>
+          <button class="filter-tab" onclick="setFilter('gtm', this)">Via GTM</button>
+          <button class="filter-tab" onclick="setFilter('blocked', this)">Blocked</button>
+        </div>
+      </div>
+
+      <div class="vendor-filter-bar">
+        <span class="vendor-filter-label">// filter by vendor</span>
+        <select id="vendorFilter" class="vendor-filter-select" onchange="applyFilters()">
+          <option value="all">All vendors</option>
+        </select>
+        <button class="clear-vendor-filter" id="clearVendorFilter" onclick="clearVendorFilter()">Clear</button>
+      </div>
 
       <div class="table-wrap">
         <table>
@@ -529,6 +648,8 @@
           <tbody id="scriptsBody"></tbody>
         </table>
       </div>
+
+      <p class="scanned-at" id="scannedAt"></p>
     </div>
   </div>
 
@@ -636,12 +757,83 @@
 </div>
 
 <script>
+  let currentFilter = 'all';
+  let currentVendor = 'all';
   let allScripts = [];
   let activeSource = null;
   let historyStatsData = null;
   let currentDbPage = 1;
   let currentDbTable = 'audits';
   let currentDbSearch = '';
+
+  const VENDOR_ICONS = {
+    'Google': 'https://www.google.com/favicon.ico',
+    'Google Ads': 'https://www.google.com/favicon.ico',
+    'Google Ads (DoubleClick)': 'https://www.google.com/favicon.ico',
+    'Google Tag Manager': 'https://www.google.com/favicon.ico',
+    'Google Analytics (UA)': 'https://www.google.com/favicon.ico',
+    'Google Analytics (Legacy)': 'https://www.google.com/favicon.ico',
+    'Google Analytics 4 (gtag)': 'https://www.google.com/favicon.ico',
+    'Google Optimize': 'https://www.google.com/favicon.ico',
+    'Google Hosted Libraries': 'https://www.google.com/favicon.ico',
+    'Facebook Pixel': 'https://www.facebook.com/favicon.ico',
+    'Facebook / Meta SDK': 'https://www.facebook.com/favicon.ico',
+    'Microsoft': 'https://www.microsoft.com/favicon.ico',
+    'Microsoft Clarity': 'https://www.microsoft.com/favicon.ico',
+    'Apple': 'https://www.apple.com/favicon.ico',
+    'Adobe': 'https://www.adobe.com/favicon.ico',
+    'Cloudflare': 'https://www.cloudflare.com/favicon.ico',
+    'Cloudflare CDNJS': 'https://www.cloudflare.com/favicon.ico',
+    'Amazon': 'https://www.amazon.com/favicon.ico',
+    'Shopify': 'https://www.shopify.com/favicon.ico',
+    'Stripe': 'https://www.stripe.com/favicon.ico',
+    'HubSpot': 'https://www.hubspot.com/favicon.ico',
+    'Salesforce': 'https://www.salesforce.com/favicon.ico',
+    'Zendesk': 'https://www.zendesk.com/favicon.ico',
+    'Intercom': 'https://www.intercom.com/favicon.ico',
+    'Drift': 'https://www.drift.com/favicon.ico',
+    'Hotjar': 'https://www.hotjar.com/favicon.ico',
+    'Segment': 'https://www.segment.com/favicon.ico',
+    'Mixpanel': 'https://www.mixpanel.com/favicon.ico',
+    'Amplitude': 'https://www.amplitude.com/favicon.ico',
+    'Heap': 'https://www.heap.io/favicon.ico',
+    'FullStory': 'https://www.fullstory.com/favicon.ico',
+    'Pendo': 'https://www.pendo.io/favicon.ico',
+    'PostHog': 'https://www.posthog.com/favicon.ico',
+    'Sentry': 'https://www.sentry.io/favicon.ico',
+    'Datadog': 'https://www.datadog.com/favicon.ico',
+    'New Relic': 'https://www.newrelic.com/favicon.ico',
+    'OneTrust': 'https://www.onetrust.com/favicon.ico',
+    'OneTrust (CMP)': 'https://www.onetrust.com/favicon.ico',
+    'Cookiebot': 'https://www.cookiebot.com/favicon.ico',
+    'Cookiebot (CMP)': 'https://www.cookiebot.com/favicon.ico',
+    'Didomi': 'https://www.didomi.io/favicon.ico',
+    'Didomi (CMP)': 'https://www.didomi.io/favicon.ico',
+    'CookieYes': 'https://www.cookieyes.com/favicon.ico',
+    'CookieYes (CMP)': 'https://www.cookieyes.com/favicon.ico',
+    'Bing Ads': 'https://www.bing.com/favicon.ico',
+    'Bing Ads (UET)': 'https://www.bing.com/favicon.ico',
+    'Crisp': 'https://www.crisp.chat/favicon.ico',
+    'LinkedIn': 'https://www.linkedin.com/favicon.ico',
+    'LinkedIn Insight Tag': 'https://www.linkedin.com/favicon.ico',
+    'Twitter/X Ads Pixel': 'https://www.twitter.com/favicon.ico',
+    'Twitter/X Platform': 'https://www.twitter.com/favicon.ico',
+    'Pinterest Tag': 'https://www.pinterest.com/favicon.ico',
+    'TikTok Pixel': 'https://www.tiktok.com/favicon.ico',
+    'Criteo': 'https://www.criteo.com/favicon.ico',
+    'Outbrain': 'https://www.outbrain.com/favicon.ico',
+    'Quantcast': 'https://www.quantcast.com/favicon.ico',
+    'Taboola': 'https://www.taboola.com/favicon.ico',
+    'Yandex': 'https://www.yandex.com/favicon.ico',
+    'Baidu': 'https://www.baidu.com/favicon.ico',
+    'Alibaba': 'https://www.alibaba.com/favicon.ico',
+    'Fastly': 'https://www.fastly.com/favicon.ico',
+    'Akamai': 'https://www.akamai.com/favicon.ico',
+    'Vercel': 'https://www.vercel.com/favicon.ico',
+    'jQuery (CDN)': 'https://www.jquery.com/favicon.ico',
+    'unpkg CDN': 'https://www.unpkg.com/favicon.ico',
+    'jsDelivr CDN': 'https://www.jsdelivr.com/favicon.ico',
+  };
 
   function switchTab(tabName) {
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -662,9 +854,18 @@
   }
 
   /* Auditor logic */
+  function cleanDomainInput(val) {
+    if (!val) return '';
+    return String(val)
+      .trim()
+      .replace(/^(https?:\/\/|https?:\/|https?:|\/+)+/i, '')
+      .replace(/^\/+/g, '')
+      .trim();
+  }
+
   function startAudit() {
-    let raw = document.getElementById('urlInput').value.trim();
-    raw = raw.replace(/^https?:\/\//i, '');
+    let raw = cleanDomainInput(document.getElementById('urlInput').value);
+    document.getElementById('urlInput').value = raw;
     if (!raw) { showError('Please enter a domain or path (e.g. example.com).'); return; }
 
     const url = 'https://' + raw;
@@ -722,7 +923,12 @@
 
   function renderResults(data) {
     allScripts = data.scripts || [];
-    document.getElementById('results').style.display = 'block';
+    currentFilter = 'all';
+    currentVendor = 'all';
+
+    document.querySelectorAll('.filter-tab').forEach((t, i) => {
+      t.classList.toggle('active', i === 0);
+    });
 
     const external = allScripts.filter(s => s.type === 'external');
     const inline   = allScripts.filter(s => s.type === 'inline');
@@ -739,16 +945,111 @@
     badge.textContent = data.gtm_detected ? 'GTM Detected' : 'No GTM';
     badge.className = data.gtm_detected ? 'tag tag-gtm' : 'tag tag-no';
 
+    const vendorCounts = {};
+    allScripts.forEach(s => {
+      vendorCounts[s.vendor] = (vendorCounts[s.vendor] || 0) + 1;
+    });
+    const sorted = Object.entries(vendorCounts).sort((a, b) => b[1] - a[1]);
+    const chipsEl = document.getElementById('vendorChips');
+    chipsEl.innerHTML = sorted.map(([vendor, count]) => {
+      const icon = VENDOR_ICONS[vendor] || null;
+      const iconHtml = icon ? `<img class="vc-icon" src="${icon}" alt="" onerror="this.style.display='none'" />` : '';
+      return `<div class="vendor-chip" onclick="filterByVendor('${esc(vendor)}', this)">
+        ${iconHtml}
+        <span class="vc-name">${esc(vendor)}</span>
+        <span class="vc-count">${count}</span>
+      </div>`;
+    }).join('');
+
+    const vendorSelect = document.getElementById('vendorFilter');
+    vendorSelect.innerHTML = '<option value="all">All vendors</option>' +
+      sorted.map(([vendor, count]) => `<option value="${esc(vendor)}">${esc(vendor)} (${count})</option>`).join('');
+
+    document.getElementById('scannedAt').textContent = data.scanned_at ? `Scanned at ${data.scanned_at}` : '';
+
+    applyFilters();
+    document.getElementById('results').style.display = 'block';
+  }
+
+  function filterByVendor(vendor, chipEl) {
+    currentVendor = vendor;
+    document.getElementById('vendorFilter').value = vendor;
+    document.getElementById('clearVendorFilter').classList.add('visible');
+    document.querySelectorAll('.vendor-chip').forEach(c => c.classList.remove('active'));
+    if (chipEl) chipEl.classList.add('active');
+    applyFilters();
+  }
+
+  function clearVendorFilter() {
+    currentVendor = 'all';
+    document.getElementById('vendorFilter').value = 'all';
+    document.getElementById('clearVendorFilter').classList.remove('visible');
+    document.querySelectorAll('.vendor-chip').forEach(c => c.classList.remove('active'));
+    applyFilters();
+  }
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const selectVal = document.getElementById('vendorFilter').value;
+    if (selectVal !== 'all') {
+      currentVendor = selectVal;
+      document.getElementById('clearVendorFilter').classList.add('visible');
+      document.querySelectorAll('.vendor-chip').forEach(c => {
+        c.classList.toggle('active', c.querySelector('.vc-name')?.textContent === currentVendor);
+      });
+    } else if (currentVendor !== 'all') {
+      currentVendor = 'all';
+      document.getElementById('clearVendorFilter').classList.remove('visible');
+      document.querySelectorAll('.vendor-chip').forEach(c => c.classList.remove('active'));
+    }
+
+    let filtered = allScripts;
+
+    if (currentVendor !== 'all') {
+      filtered = filtered.filter(s => s.vendor === currentVendor);
+    }
+
+    if (currentFilter === 'gtm') {
+      filtered = filtered.filter(s => s.via_gtm);
+    } else if (currentFilter === 'blocked') {
+      filtered = filtered.filter(s => s.blocked);
+    } else if (currentFilter !== 'all') {
+      filtered = filtered.filter(s => s.type === currentFilter);
+    }
+
+    renderTable(filtered);
+  }
+
+  function renderTable(scripts) {
     const tbody = document.getElementById('scriptsBody');
-    tbody.innerHTML = allScripts.map(s => `<tr>
-      <td title="${esc(s.name)}">${esc(formatScriptName(s.name))}</td>
-      <td>${esc(s.vendor)}</td>
-      <td><span class="tag tag-${s.type}">${s.type}</span></td>
-      <td>${s.via_gtm ? '<span class="tag tag-gtm">YES</span>' : '<span class="tag tag-no">NO</span>'}</td>
-      <td>${s.blocked ? '<span class="tag tag-blocked">BLOCKED</span>' : '<span class="tag tag-no">OK</span>'}</td>
-      <td>${esc(extractDomain(s.url))}</td>
-      <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><a href="${esc(s.url)}" target="_blank" style="color:var(--text-muted);">${esc(s.url)}</a></td>
-    </tr>`).join('');
+    if (!scripts || scripts.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:16px; color:var(--text-muted);">No scripts match current filters.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = scripts.map(s => {
+      const icon = VENDOR_ICONS[s.vendor] || null;
+      const iconHtml = icon ? `<img src="${icon}" width="14" height="14" style="border-radius:2px; vertical-align:middle; margin-right:6px;" onerror="this.style.display='none'" />` : '';
+      const vendorCell = `<span>${iconHtml}${esc(s.vendor)}</span>`;
+      const rowClass = s.blocked ? 'is-blocked' : (s.via_gtm ? 'via-gtm' : '');
+      const blockedTag = s.blocked ? `<span class="tag tag-blocked">BLOCKED</span>${s.block_reason ? `<span class="block-reason">${esc(s.block_reason)}</span>` : ''}` : '<span class="tag tag-no">OK</span>';
+
+      return `<tr class="${rowClass}">
+        <td title="${esc(s.name)}">${esc(formatScriptName(s.name))}</td>
+        <td>${vendorCell}</td>
+        <td><span class="tag tag-${s.type}">${s.type}</span></td>
+        <td>${s.via_gtm ? '<span class="tag tag-gtm">YES</span>' : '<span class="tag tag-no">NO</span>'}</td>
+        <td>${blockedTag}</td>
+        <td>${esc(extractDomain(s.url))}</td>
+        <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><a href="${esc(s.url)}" target="_blank" style="color:var(--text-muted);">${esc(s.url)}</a></td>
+      </tr>`;
+    }).join('');
   }
 
   /* History Page */
@@ -825,7 +1126,7 @@
       .then(r => r.json())
       .then(data => {
         switchTab('auditor');
-        let domain = (data.url || '').replace(/^https?:\/\//i, '');
+        let domain = cleanDomainInput(data.url || '');
         document.getElementById('urlInput').value = domain;
         renderResults(data);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -970,15 +1271,16 @@
   }
 
   const urlInputEl = document.getElementById('urlInput');
-  urlInputEl.addEventListener('input', (e) => {
-    let val = e.target.value;
-    if (val.startsWith('https://')) {
-      e.target.value = val.slice(8);
-    } else if (val.startsWith('http://')) {
-      e.target.value = val.slice(7);
+  function sanitizeInputEl(el) {
+    const cleaned = cleanDomainInput(el.value);
+    if (cleaned !== el.value) {
+      el.value = cleaned;
     }
-  });
+  }
 
+  urlInputEl.addEventListener('input', () => sanitizeInputEl(urlInputEl));
+  urlInputEl.addEventListener('blur', () => sanitizeInputEl(urlInputEl));
+  urlInputEl.addEventListener('paste', () => setTimeout(() => sanitizeInputEl(urlInputEl), 10));
   urlInputEl.addEventListener('keydown', e => { if (e.key === 'Enter') startAudit(); });
 </script>
 </body>
