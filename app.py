@@ -6,6 +6,7 @@ Then open: http://localhost:7070
 """
 
 import json
+import logging
 import queue
 import threading
 import uuid
@@ -15,6 +16,13 @@ from playwright.sync_api import sync_playwright
 
 from audit_scripts import audit_url
 import db
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%SZ",
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -39,6 +47,7 @@ def _send(q: queue.Queue, event_type: str, **kwargs):
 
 def run_audit_job(job_id: str, url: str, timeout_ms: int, interactions: dict = None):
     q = _jobs[job_id]
+    logger.info("Job %s started: %s (timeout=%dms)", job_id, url, timeout_ms)
     try:
         _send(q, "status", message="Launching browser...")
         with sync_playwright() as pw:
@@ -52,6 +61,7 @@ def run_audit_job(job_id: str, url: str, timeout_ms: int, interactions: dict = N
                 browser.close()
 
         if result.get("error"):
+            logger.warning("Job %s audit error: %s", job_id, result["error"])
             _send(q, "error", message=result["error"])
         else:
             # Persist successful audit to Turso DB
@@ -61,7 +71,9 @@ def run_audit_job(job_id: str, url: str, timeout_ms: int, interactions: dict = N
 
             _send(q, "status", message="Processing results...")
             _send(q, "result", data=result)
+            logger.info("Job %s completed: %d scripts found", job_id, len(result.get("scripts", [])))
     except Exception as e:
+        logger.exception("Job %s raised an unexpected exception", job_id)
         _send(q, "error", message=str(e))
     finally:
         _send(q, "done")
