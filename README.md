@@ -175,7 +175,31 @@ script-auditor/
 
 ---
 
-## Deploy on a Linux VPS
+## Deploy on Easypanel / Docker
+
+Script Auditor includes a production `Dockerfile` ready for deployment on **Easypanel** or any Docker environment.
+
+### Docker Compose (Local)
+
+```bash
+docker compose up --build
+```
+Access Flask (V1) at `http://localhost:7070`.
+
+### Deploying on Easypanel VPS
+
+1. **Connect Repo**: In your Easypanel dashboard, create a new App and connect it to your Git repository.
+2. **Build Method**: Select **Dockerfile** (Easypanel automatically detects `Dockerfile` in root).
+3. **Environment Variables**:
+   - `PORT`: `7070` (default)
+   - `TURSO_DATABASE_URL`: *(optional, for database persistence)*
+   - `TURSO_AUTH_TOKEN`: *(optional)*
+4. **Port Configuration**: Set container port to `7070` in Easypanel application settings.
+5. **Deploy**: Click Deploy. Easypanel will build the container, install Playwright Chromium dependencies, and start Gunicorn.
+
+---
+
+## Deploy on a Linux VPS (Systemd / Nginx)
 
 ### One-shot setup
 

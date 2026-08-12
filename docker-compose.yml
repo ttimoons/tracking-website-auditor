@@ -1,0 +1,10 @@
+services:
+  script-auditor:
+    build: .
+    ports:
+      - "7070:7070"
+    environment:
+      - PORT=7070
+      - TURSO_DATABASE_URL=${TURSO_DATABASE_URL:-}
+      - TURSO_AUTH_TOKEN=${TURSO_AUTH_TOKEN:-}
+    restart: unless-stopped

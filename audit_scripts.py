@@ -603,7 +603,11 @@ def run_audit(urls: list, args: argparse.Namespace) -> None:
 
     results = []
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=headless, channel="chrome")
+        launch_args = ["--no-sandbox", "--disable-dev-shm-usage"]
+        try:
+            browser = pw.chromium.launch(headless=headless, channel="chrome", args=launch_args)
+        except Exception:
+            browser = pw.chromium.launch(headless=headless, args=launch_args)
         try:
             for i, url in enumerate(urls, start=1):
                 result = audit_url(url, browser, timeout_ms, interactions)

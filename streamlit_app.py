@@ -406,11 +406,18 @@ def run_audit(url, timeout, click_consent, scroll, scroll_count):
     }
 
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(
-            headless=True,
-            channel="chrome",
-            args=["--no-sandbox", "--disable-dev-shm-usage"],
-        )
+        launch_args = ["--no-sandbox", "--disable-dev-shm-usage"]
+        try:
+            browser = pw.chromium.launch(
+                headless=True,
+                channel="chrome",
+                args=launch_args,
+            )
+        except Exception:
+            browser = pw.chromium.launch(
+                headless=True,
+                args=launch_args,
+            )
         try:
             result = audit_url(url, browser, timeout * 1000, interactions)
         finally:

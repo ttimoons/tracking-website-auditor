@@ -1,7 +1,10 @@
 # Gunicorn configuration for script-auditor
 # SSE requires long-lived connections → use sync workers with long timeout
 
-bind = "127.0.0.1:7070"
+import os
+
+port = os.environ.get("PORT", "7070")
+bind = f"0.0.0.0:{port}"
 workers = 1          # must be 1 — job queue is in-process memory, not shared across workers
 threads = 8          # handle concurrent audits + SSE streams within the single worker
 timeout = 180        # seconds — must exceed max audit timeout (120s) + buffer

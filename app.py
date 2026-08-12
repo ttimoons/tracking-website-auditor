@@ -51,7 +51,11 @@ def run_audit_job(job_id: str, url: str, timeout_ms: int, interactions: dict = N
     try:
         _send(q, "status", message="Launching browser...")
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True, channel="chrome", args=["--no-sandbox", "--disable-dev-shm-usage"])
+            launch_args = ["--no-sandbox", "--disable-dev-shm-usage"]
+            try:
+                browser = pw.chromium.launch(headless=True, channel="chrome", args=launch_args)
+            except Exception:
+                browser = pw.chromium.launch(headless=True, args=launch_args)
             try:
                 _send(q, "status", message=f"Connecting to {url} ...")
                 if interactions and (interactions.get('click_consent') or interactions.get('scroll')):
@@ -210,6 +214,8 @@ def get_db_table_data_api(table_name: str):
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    print("Starting server at http://127.0.0.1:7070")
-    app.run(debug=False, threaded=True, port=7070)
+    port = int(os.environ.get("PORT", 7070))
+    host = os.environ.get("HOST", "0.0.0.0")
+    print(f"Starting server at http://{host}:{port}")
+    app.run(host=host, debug=False, threaded=True, port=port)
 

@@ -27,6 +27,8 @@ REQUIREMENTS = os.path.join(SCRIPT_DIR, "requirements.txt")
 
 
 def _running_in_venv():
+    if os.environ.get("NO_VENV") == "1" or os.environ.get("DOCKER_CONTAINER") == "1":
+        return True
     return os.path.abspath(sys.executable) == os.path.abspath(VENV_PY)
 
 
@@ -100,7 +102,8 @@ def main():
     print("Press Ctrl+C to stop both.\n")
 
     env = os.environ.copy()
-    env["PATH"] = VENV_BIN + ":" + env["PATH"]
+    if os.path.exists(VENV_BIN):
+        env["PATH"] = VENV_BIN + ":" + env.get("PATH", "")
 
     flask_proc = subprocess.Popen(
         [sys.executable, "app.py"],
