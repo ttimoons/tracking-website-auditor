@@ -3,7 +3,7 @@
 start.py — One-command launcher for Script Auditor.
 
 Ensures the virtualenv exists with all dependencies (and Playwright's Chromium)
-installed, then starts both the Flask (V1) and Streamlit (V2) apps together.
+installed, then starts the Flask app.
 
 Just run:
 
@@ -34,7 +34,7 @@ def _running_in_venv():
 
 def _deps_installed():
     return subprocess.run(
-        [VENV_PY, "-c", "import flask, streamlit, playwright"],
+        [VENV_PY, "-c", "import flask, playwright"],
         cwd=SCRIPT_DIR,
     ).returncode == 0
 
@@ -85,8 +85,8 @@ def ensure_venv():
         except subprocess.CalledProcessError:
             print(
                 "  Note: could not install Playwright's Chromium on this system.\n"
-                "  The apps will still start; audits require Google Chrome to be\n"
-                "  installed (the apps launch it via channel=\"chrome\")."
+                "  The app will still start; audits require Google Chrome to be\n"
+                "  installed (the app launches it via channel=\"chrome\")."
             )
 
     # Re-exec under the venv's Python so sys.executable (used to spawn the
@@ -96,10 +96,9 @@ def ensure_venv():
 
 def main():
     print("Starting Script Auditor...")
-    print("  V1 (Flask):     http://localhost:7070")
-    print("  V2 (Streamlit): http://localhost:8501")
+    print("  Flask UI: http://localhost:7070")
     print()
-    print("Press Ctrl+C to stop both.\n")
+    print("Press Ctrl+C to stop.\n")
 
     env = os.environ.copy()
     if os.path.exists(VENV_BIN):
@@ -111,33 +110,19 @@ def main():
         env=env,
     )
 
-    streamlit_proc = subprocess.Popen(
-        [sys.executable, "-m", "streamlit", "run", "streamlit_app.py",
-         "--server.port", "8501", "--server.headless", "true",
-         "--browser.gatherUsageStats", "false"],
-        cwd=SCRIPT_DIR,
-        env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-
     def shutdown(signum, frame):
         print("\nShutting down...")
         flask_proc.terminate()
-        streamlit_proc.terminate()
         flask_proc.wait()
-        streamlit_proc.wait()
         sys.exit(0)
 
     signal.signal(signal.SIGINT, shutdown)
     signal.signal(signal.SIGTERM, shutdown)
 
-    while flask_proc.poll() is None and streamlit_proc.poll() is None:
-        try:
-            flask_proc.wait(timeout=1)
-        except subprocess.TimeoutExpired:
-            pass
-    streamlit_proc.wait()
+    try:
+        flask_proc.wait()
+    except KeyboardInterrupt:
+        shutdown(None, None)
 
 
 if __name__ == "__main__":

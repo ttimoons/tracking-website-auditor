@@ -5,7 +5,6 @@ Detect every JavaScript script loaded on a webpage — including tags **injected
 ![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)
 ![Playwright](https://img.shields.io/badge/playwright-chromium-green)
 ![Flask](https://img.shields.io/badge/flask-3.x-lightgrey)
-![Streamlit](https://img.shields.io/badge/streamlit-1.x-red)
 
 ---
 
@@ -15,8 +14,7 @@ Detect every JavaScript script loaded on a webpage — including tags **injected
 - 🏷️ **GTM-aware**: flags scripts loaded by Google Tag Manager
 - 🏢 **1200+ domains** mapped via DuckDuckGo Tracker Radar + pattern matching
 - 🖱️ **User interactions**: auto-clicks cookie consent banners, scrolls page to trigger lazy-loaded scripts
-- 🌐 **V1 Web UI** (Flask) — opencode-styled dark theme with vendor filtering, icons, SSE progress
-- 📊 **V2 Web UI** (Streamlit) — data tables with built-in sorting, filtering, export
+- 🌐 **Web UI** (Flask) — dark theme with vendor filtering, icons, SSE progress
 - 💻 **CLI mode** for terminal use and batch processing
 - 📄 JSON output for every scan
 
@@ -24,19 +22,19 @@ Detect every JavaScript script loaded on a webpage — including tags **injected
 
 ## Quick Start
 
-### Start both UIs (one command)
+### Start the Web UI (one command)
 
 ```bash
 python3 start.py
 ```
 
 On first run this creates the `venv/`, installs dependencies, and installs
-Playwright's Chromium (best-effort), then launches both apps. It works whether
+Playwright's Chromium (best-effort), then launches the Flask app at http://localhost:7070. It works whether
 or not the venv is activated — no manual setup needed.
 
-> A browser is only required to run an actual audit, not to launch the apps.
+> A browser is only required to run an actual audit, not to launch the app.
 > Where Playwright's Chromium can't be installed (e.g. some Linux distros), the
-> apps fall back to a system **Google Chrome** install, launched via
+> app falls back to a system **Google Chrome** install, launched via
 > `channel="chrome"`.
 
 <details>
@@ -52,8 +50,7 @@ python3 -m playwright install chromium
 
 | App | URL | Description |
 |-----|-----|-------------|
-| **V1 (Flask)** | http://localhost:7070 | Full-featured SPA with SSE streaming |
-| **V2 (Streamlit)** | http://localhost:8501 | Data table view with sorting/filtering |
+| **Flask UI** | http://localhost:7070 | Full-featured SPA with SSE streaming |
 
 ### 3. Or use the CLI
 
@@ -152,9 +149,8 @@ python3 audit_scripts.py --scroll-count N       Number of scroll steps (default:
 
 ```
 script-auditor/
-├── app.py                  # Flask web app (V1)
-├── streamlit_app.py        # Streamlit web app (V2)
-├── start.py                # Start both apps together
+├── app.py                  # Flask web app
+├── start.py                # Start Flask app (bootstraps venv)
 ├── audit_scripts.py        # Core audit engine + CLI
 ├── vendor_map.py           # Vendor detection (Tracker Radar + patterns)
 ├── vendor_db.json          # Bundled domain→vendor mapping (DuckDuckGo)
@@ -166,7 +162,7 @@ script-auditor/
 │   ├── icon-*.png          # App icons (all sizes)
 │   └── manifest.json       # PWA manifest
 ├── templates/
-│   └── index.html          # V1 UI (Flask)
+│   └── index.html          # UI template (Flask)
 └── deploy/
     ├── setup.sh            # VPS install script
     ├── script-auditor.service

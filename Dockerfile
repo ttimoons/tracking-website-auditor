@@ -24,8 +24,8 @@ RUN python -m playwright install --with-deps chromium
 # Copy application code
 COPY . .
 
-# Expose default app ports (7070 for Flask V1, 8501 for Streamlit V2)
-EXPOSE 7070 8501
+# Expose default app port (7070 for Flask)
+EXPOSE 7070
 
 # Default command: run Gunicorn for production
 CMD ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]
